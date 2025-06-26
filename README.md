@@ -1,4 +1,4 @@
-# Newtube
+# OpenStream
 
 This project uses **Next.js** with **Supabase** for backend services. All application code lives under the `src/` directory.
 
