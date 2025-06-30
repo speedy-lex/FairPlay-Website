@@ -16,7 +16,7 @@
   justify-content: space-between;
   padding: 0 1rem;
   height: 56px;
-  background-color: #0f0f0f;
+  background-color: #181818;
   border-bottom: 1px solid #333;
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
   position: relative;
@@ -27,6 +27,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  text-decoration: none;
 }
 
 .menuButton {
@@ -46,9 +47,9 @@
 .menuButton:hover { background-color: #333; }
 
 .logoImg {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 9999px;
+  width: 11rem;
+  height: 2.5rem;
+  
   object-fit: cover;
 }
 
@@ -125,7 +126,7 @@
 .userProfileImg {
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 9999px;
+  border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
 }

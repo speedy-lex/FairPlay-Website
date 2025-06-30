@@ -32,13 +32,14 @@ export const Layout = ({ children, active = 'home', onCreateClick }: LayoutProps
           <button className={styles.menuButton} onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
             <MenuIcon />
           </button>
-          <img
-            src="https://placehold.co/32x32/FF0000/FFFFFF?text=YT"
-            alt="NewTube Logo"
-            className={styles.logoImg}
-            onError={e => { const t = e.currentTarget; t.onerror = null; t.src = 'https://placehold.co/32x32/FF0000/FFFFFF?text=YT' }}
-          />
-          <span className={styles.logoText}>NewTube</span>
+          <Link href="/" className={styles.logoSection} >
+            <img
+              src="/horitontal_tree_adapted.png"
+              alt="OpenStream Logo"
+              className={styles.logoImg}
+              onError={e => { const t = e.currentTarget; t.onerror = null; t.src = 'https://placehold.co/32x32/FF0000/FFFFFF?text=OS' }}
+            />
+          </Link>
         </div>
         <div className={styles.searchBarContainer}>
           <input type="text" className={styles.searchInput} placeholder="Rechercher" />

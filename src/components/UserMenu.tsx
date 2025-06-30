@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import styles from './Layout.module.css'
 
 export const UserMenu = () => {
   const [open, setOpen] = useState(false)
@@ -30,19 +31,30 @@ export const UserMenu = () => {
   }
 
   const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'Utilisateur'
-
+  // Génère les initiales à partir du nom d'utilisateur ou de l'email
+  const getInitials = () => {
+    if (user?.user_metadata?.username) {
+      return user.user_metadata.username.slice(0, 2).toUpperCase()
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase()
+    }
+    return 'JD'
+  }
+  const initials = getInitials()
   return (
     <div className="user-menu-container" ref={containerRef}>
-      <img
-        src="https://placehold.co/36x36/4A4A4A/FFFFFF?text=JD"
+      <img 
+        src={`https://placehold.co/36x36/4A4A4A/FFFFFF?text=${initials}`}
         alt="Profil utilisateur"
-        className="user-profile-img"
+        className={styles.userProfileImg}
         onClick={() => setOpen(!open)}
         onError={e => {
           const target = e.currentTarget
           target.onerror = null
           target.src = 'https://placehold.co/36x36/4A4A4A/FFFFFF?text=JD'
         }}
+        
       />
       {open && (
         <div className="user-menu">
