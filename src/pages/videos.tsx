@@ -49,7 +49,7 @@ export default function VideosPage() {
   const categories = React.useMemo(() => {
     const all = videos.flatMap(v => parseThemes((v as any).themes))
     const unique = Array.from(new Set(all))
-    return ['Tous', ...unique]
+    return ['Tous',  ...unique]
   }, [videos])
 
   const filteredVideos = selectedCategory === 'Tous'
@@ -77,32 +77,42 @@ export default function VideosPage() {
         ) : error ? (
           <p className="video-meta video-error">Erreur : {error}</p>
         ) : (
-          <div className="video-grid">
-            {filteredVideos.map(video => (
-              <Link key={video.id} href={`/video/${video.id}`} className="card">
-                <div className="mediaWrapper">
-                  {video.type === 'youtube' && video.youtube_id && (
-                    <span className="tagYT">YT</span>
-                  )}
-                  {video.type === 'youtube' && video.youtube_id ? (
-                    <img
-                      src={`http://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
-                      alt={video.title}
-                      className="media"
-                    />
-                  ) : video.type === 'native' && video.url ? (
-                    <video src={video.url} muted className="media" />
-                  ) : null}
-                </div>
-                <div className="contentBlock">
-                  <h2 className="videoTitle">{video.title}</h2>
-                  <p className="score">{video.quality_score !== undefined && video.quality_score !== null ? video.quality_score.toFixed(1) : 'N/A'} / 5</p>
-                  <p className="description">{video.description}</p>
-                  <p className="theme">{parseThemes(video.themes).join(', ')}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <>
+            <h2 className="section-title">
+              <span className="icon-info">
+          <svg viewBox="0 0 25 25" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+              </span>
+              Contenus Recommandés pour un Flux Fiable
+            </h2>
+            <div className="video-grid">
+              {filteredVideos.map(video => (
+          <Link key={video.id} href={`/video/${video.id}`} className="card">
+            <div className="mediaWrapper">
+              {video.type === 'youtube' && video.youtube_id && (
+                <span className="tagYT">YT</span>
+              )}
+              {video.type === 'youtube' && video.youtube_id ? (
+                <img
+            src={`http://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
+            alt={video.title}
+            className="media"
+                />
+              ) : video.type === 'native' && video.url ? (
+                <video src={video.url} muted className="media" />
+              ) : null}
+            </div>
+            <div className="contentBlock">
+              <h2 className="videoTitle">{video.title}</h2>
+              <p className="score">{video.quality_score !== undefined && video.quality_score !== null ? video.quality_score.toFixed(1) : 'N/A'} / 5</p>
+              <p className="description">{video.description}</p>
+              <p className="theme">{parseThemes(video.themes).join(', ')}</p>
+            </div>
+          </Link>
+              ))}
+            </div>
+          </>
         )}
       </section>
       {showUploadModal && (
@@ -114,12 +124,35 @@ export default function VideosPage() {
         #__next { height: 100%; } /* S'assurer que le conteneur Next.js prend toute la hauteur */
       `}</style>
       <style jsx>{`
+        :global(a) {
+            text-decoration: none !important;
+          }
+            .icon-info {
+          display: inline-flex;
+          vertical-align: middle;
+          margin-right: 0.5em;
+              }
+              .icon-info svg {
+          width: 1em;
+          height: 1em;
+          color: #3dda50;
+              }
+              .section-title {
+          display: flex;
+          align-items: center;
+          font-size: 1.2rem;
+          font-weight: 500;
+          margin-bottom: 1rem;
+          gap: 0.5em;
+              }
         .video-grid-section {
           flex: 1;
           display: flex;
           flex-direction: column;
           padding: 1rem;
           overflow-y: auto;
+          text-decoration: none;
+          
         }
         .category-filters {
           position: relative;
@@ -133,27 +166,32 @@ export default function VideosPage() {
           gap: 0.5rem;
           -ms-overflow-style: none;
           scrollbar-width: none;
+          border-top: 1px solid #383838;
+          border-bottom: 1px solid #383838;
+          
         }
         .category-filters::-webkit-scrollbar { display: none; }
         .category-button {
-          padding: 0.5rem 1rem;
-          border-radius: 9999px;
-          font-size: 0.875rem;
-          font-weight: 500;
-          white-space: nowrap;
-          border: none;
-          cursor: pointer;
-          transition: background-color 0.2s, color 0.2s;
+          background-color: var(--border-color);
+        color: var(--text-color);
+        border: none; padding: .5rem 1rem;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: .9rem;
+        transition: background-color .3s, color .3s;
         }
         .category-button.active {
-          background-color: #fff;
-          color: #1a1a1a;
+          background-color: #3dda50;
+          color:rgb(255, 255, 255);
         }
         .category-button.inactive {
           background-color: #333;
           color: #fff;
         }
         .category-button.inactive:hover { background-color: #4a4a4a; }
+        .category-button * {
+          text-decoration: none !important;
+        }
         .category-scroll-button {
           padding: 0.5rem;
           background-color: transparent;
@@ -165,6 +203,7 @@ export default function VideosPage() {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
           gap: 16px;
+          
         }
         .card {
           position: relative;
@@ -214,6 +253,8 @@ export default function VideosPage() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          text-decoration: none;
+          
         }
         .score { font-size: 14px; color: #aaa; margin: 0 0 8px; }
         .description {
@@ -224,6 +265,7 @@ export default function VideosPage() {
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
+          text-decoration: none
         }
         .theme { font-size: 14px; color: #aaa; margin: 0; }
       `}</style>

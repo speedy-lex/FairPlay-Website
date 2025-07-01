@@ -62,13 +62,6 @@ export const Layout = ({ children, active = 'home', onCreateClick }: LayoutProps
           <nav className={styles.sidebarNav}>
             <ul>
               <li className={styles.sidebarListItem}>
-                <button onClick={() => (window.location.href = '/')}
-                  className={`${styles.sidebarLink} ${active === 'home' ? styles.active : ''}`}
-                >
-                  <HomeIcon /> Accueil
-                </button>
-              </li>
-              <li className={styles.sidebarListItem}>
                 <button onClick={() => (window.location.href = '/videos')}
                   className={`${styles.sidebarLink} ${active === 'videos' ? styles.active : ''}`}
                 >
