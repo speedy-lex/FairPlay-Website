@@ -7,4 +7,5 @@ export type Video = {
   youtube_id: string | null
   quality_score: number | null
   themes: string[] | string | null
+  duration: string
 }
