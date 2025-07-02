@@ -88,13 +88,14 @@ export default function VideosPage() {
             </h2>
             <div className="video-grid">
               {filteredVideos.map(video => (
-          <Link key={video.id} href={`/video/${video.id}`} className="card">
-            <div className="mediaWrapper">
-              {video.type === 'youtube' && video.youtube_id && (
-                <span className="tagYT">YT</span>
-              )}
-              {video.type === 'youtube' && video.youtube_id ? (
-                <img
+          <Link key={video.id} href={`/video/${video.id}`}>
+            <div className="card">
+              <div className="mediaWrapper">
+                {video.type === 'youtube' && video.youtube_id && (
+                  <span className="tagYT">YT</span>
+                )}
+                {video.type === 'youtube' && video.youtube_id ? (
+                  <img
             src={`http://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
             alt={video.title}
             className="media"
@@ -102,12 +103,13 @@ export default function VideosPage() {
               ) : video.type === 'native' && video.url ? (
                 <video src={video.url} muted className="media" />
               ) : null}
-            </div>
-            <div className="contentBlock">
-              <h2 className="videoTitle">{video.title}</h2>
-              <p className="score">{video.quality_score !== undefined && video.quality_score !== null ? video.quality_score.toFixed(1) : 'N/A'} / 5</p>
-              <p className="description">{video.description}</p>
-              <p className="theme">{parseThemes(video.themes).join(', ')}</p>
+              </div>
+              <div className="contentBlock">
+                <h2 className="videoTitle">{video.title}</h2>
+                <p className="score">{video.quality_score !== undefined && video.quality_score !== null ? video.quality_score.toFixed(1) : 'N/A'} / 5</p>
+                <p className="description">{video.description}</p>
+                <p className="theme">{parseThemes(video.themes).join(', ')}</p>
+              </div>
             </div>
           </Link>
               ))}
@@ -124,6 +126,7 @@ export default function VideosPage() {
         #__next { height: 100%; } /* S'assurer que le conteneur Next.js prend toute la hauteur */
       `}</style>
       <style jsx>{`
+      
         :global(a) {
             text-decoration: none !important;
           }
@@ -172,8 +175,8 @@ export default function VideosPage() {
         }
         .category-filters::-webkit-scrollbar { display: none; }
         .category-button {
-          background-color: var(--border-color);
-        color: var(--text-color);
+          background-color: #383838;
+        color: #ffffff;
         border: none; padding: .5rem 1rem;
         border-radius: 20px;
         cursor: pointer;
@@ -201,26 +204,29 @@ export default function VideosPage() {
         }
         .video-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 1.5rem;
           
         }
         .card {
-          position: relative;
-          background: #282828;
+          background-color: #181818;
           border-radius: 8px;
           overflow: hidden;
+          box-shadow: 0 2px 10px rgba(0,0,0,.4);
+          transition: transform .2s, box-shadow .2s, background-color .2s;
+          display: flex; flex-direction: column;
           cursor: pointer;
-          transition: box-shadow .2s ease;
-          text-decoration: none;
-          color: inherit;
         }
-        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .card:hover { transform: translateY(-3px);
+          box-shadow: 0 6px 15px rgba(0,0,0,.6);
+          background-color: #2a2a2a;
+       }
         .mediaWrapper {
           position: relative;
           width: 100%;
-          aspect-ratio: 16/9;
+          padding-top: 56.25%; /* Ratio 16:9 pour la miniature */
           overflow: hidden;
+          border-bottom: 1px solid var(--border-color);
         }
         .media {
           position: absolute;
