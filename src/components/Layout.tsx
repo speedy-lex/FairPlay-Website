@@ -24,15 +24,21 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children, active = 'home', onCreateClick }: LayoutProps) => {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
+
   return (
     <div className={styles.appContainer}>
       <header className={styles.header}>
         <div className={styles.logoSection}>
-          <button className={styles.menuButton} onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
+          <button
+            className={styles.menuButton}
+            onClick={() => setCollapsed(!collapsed)}
+            aria-label={collapsed ? "Ouvrir la barre latérale" : "Fermer la barre latérale"}
+            aria-expanded={!collapsed}
+          >
             <MenuIcon />
           </button>
-          <Link href="/" className={styles.logoSection} >
+          <Link href="/" className={styles.logoSection}>
             <img
               src="/horitontal_tree_adapted.png"
               alt="OpenStream Logo"
@@ -62,7 +68,16 @@ export const Layout = ({ children, active = 'home', onCreateClick }: LayoutProps
           <nav className={styles.sidebarNav}>
             <ul>
               <li className={styles.sidebarListItem}>
-                <button onClick={() => (window.location.href = '/videos')}
+                <button
+                  onClick={() => (window.location.href = '/')}
+                  className={`${styles.sidebarLink} ${active === 'home' ? styles.active : ''}`}
+                >
+                  <HomeIcon /> Accueil
+                </button>
+              </li>
+              <li className={styles.sidebarListItem}>
+                <button
+                  onClick={() => (window.location.href = '/videos')}
                   className={`${styles.sidebarLink} ${active === 'videos' ? styles.active : ''}`}
                 >
                   <SubscriptionsIcon /> Explorer
