@@ -38,6 +38,8 @@
   cursor: pointer;
   color: #fff;
   display: none;
+  position: relative;
+  z-index: 30;
 }
 
 @media (max-width: 767px) {
