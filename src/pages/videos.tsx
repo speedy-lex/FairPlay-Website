@@ -122,7 +122,11 @@ export default function VideosPage() {
                       <h2 className="videoTitle">{video.title}</h2>
                       <p className="score">{video.quality_score !== undefined && video.quality_score !== null ? video.quality_score.toFixed(1) : 'N/A'} / 5</p>
                       <p className="description">{video.description}</p>
-                      <p className="theme">{parseThemes(video.themes).join(', ')}</p>
+                      <div className="video-tags">
+                        {parseThemes(video.themes).map((theme, index) => (
+                          <p key={index} className="theme">{theme}</p>
+                        ))}
+                      </div>
                     </div>
                   </a>
                 </Link>
@@ -147,6 +151,11 @@ export default function VideosPage() {
           display: inline-flex;
           vertical-align: middle;
           margin-right: 0.5em;
+        }
+        .video-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 5px;
         }
         .icon-info svg {
           width: 1em;
@@ -333,6 +342,14 @@ export default function VideosPage() {
           bottom: -4px;
           left: 0;
           background: linear-gradient(to right, #3dda50, #3dda50);
+        }
+        .video-tags .theme {
+          background-color: #282828;
+          color: #28a745;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.7em;
+          font-weight: bold;
         }
       `}</style>
     </Layout>
