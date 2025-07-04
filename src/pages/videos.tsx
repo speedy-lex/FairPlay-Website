@@ -184,6 +184,7 @@ export default function VideosPage() {
           background-color: #0f0f0f;
           padding: 1rem 0;
           margin-bottom: 1rem;
+          max-height: 35px;
           flex-shrink: 0;
           display: flex;
           overflow-x: auto;
@@ -197,7 +198,8 @@ export default function VideosPage() {
         .category-button {
           background-color: #383838;
           color: #ffffff;
-          border: none; padding: .5rem 1rem;
+          border: none; 
+          padding: 0rem 1rem;
           border-radius: 20px;
           cursor: pointer;
           font-size: .9rem;
@@ -341,7 +343,7 @@ export default function VideosPage() {
           height: 2px;
           bottom: -4px;
           left: 0;
-          background: linear-gradient(to right, #3dda50, #3dda50);
+          /* background: linear-gradient(to right, #3dda50, #3dda50); */
         }
         .video-tags .theme {
           background-color: #282828;
