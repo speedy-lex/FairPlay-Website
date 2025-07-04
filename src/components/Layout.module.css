@@ -109,6 +109,8 @@
   cursor: pointer;
   color: #fff;
   position: relative;
+  max-height: 40px;
+  max-width: 40px;
 }
 
 .iconButton:hover { background-color: #333; }
