@@ -69,6 +69,7 @@ export const UserMenu = () => {
       <style jsx>{`
         .user-menu-container {
           position: relative;
+          max-height: 36px;
         }
         .user-menu {
           position: absolute;
