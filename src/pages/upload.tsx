@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { parseThemes } from '@/lib/utils'
+import { parseThemes, extractYoutubeId } from '@/lib/utils'
 import { useRouter } from 'next/router'
 import { useDropzone } from 'react-dropzone'
 
@@ -51,15 +51,11 @@ export default function Upload() {
     setTags(tags.filter(t => t !== tag))
   }
 
-  const extractYoutubeId = (url: string) => {
-    const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/(.+)$/)
-    return match ? match[1] : null
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      // Récupérer l'utilisateur pour ajouter user_id
+      // get user to add user_id
       const { data: { user }, error: userError } = await supabase.auth.getUser()
       if (userError || !user) throw new Error('Utilisateur non authentifié')
 

@@ -1,4 +1,3 @@
-// videos.tsx
 import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -31,7 +30,6 @@ export default function VideosPage() {
         vids = data || []
       }
 
-      // Pour chaque vidéo YouTube, va chercher la durée
       const vidsWithDuration = await Promise.all(
         vids.map(async v => {
           let duration = v.duration ?? ''
@@ -115,7 +113,7 @@ export default function VideosPage() {
                         <video src={video.url} muted className="media" />
                       ) : null}
                       <span className="video-duration">
-                        {video.type === 'youtube' ? parseISODuration(video.duration) : video.duration}
+                        {video.type === 'youtube' ? parseISODuration(video.duration ?? '') : video.duration}
                       </span>
                     </div>
                     <div className="contentBlock">
@@ -365,7 +363,7 @@ async function fetchYoutubeDuration(youtubeId: string): Promise<string> {
     const response = await fetch(url)
     const data = await response.json()
     if (data.items.length === 0) return ''
-    // data.items[0].contentDetails.duration est au format ISO 8601, ex: "PT1H2M10S"
+    // data.items[0].contentDetails.duration is using ISO 8601 format
     return data.items[0].contentDetails.duration
   } catch {
     return ''

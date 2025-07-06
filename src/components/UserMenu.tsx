@@ -31,7 +31,7 @@ export const UserMenu = () => {
   }
 
   const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'Utilisateur'
-  // Génère les initiales à partir du nom d'utilisateur ou de l'email
+  // Generate initials based on username or email
   const getInitials = () => {
     if (user?.user_metadata?.username) {
       return user.user_metadata.username.slice(0, 2).toUpperCase()

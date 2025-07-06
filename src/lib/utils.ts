@@ -26,3 +26,14 @@ export function parseThemes(value: string[] | string | null | undefined): string
 
   return [value as string]
 }
+
+/**
+ * Extract a YouTube video id from a variety of URL formats.
+ */
+export function extractYoutubeId(url: string): string | null {
+  const match =
+    url.match(/[?&]v=([^&]+)/) ||
+    url.match(/youtu\.be\/([^?]+)/) ||
+    url.match(/youtube\.com\/embed\/([^?]+)/)
+  return match ? match[1] : null
+}

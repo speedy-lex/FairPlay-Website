@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { supabase } from '@/lib/supabase'
 import { XIcon } from './icons'
-import { parseThemes } from '@/lib/utils'
+import { parseThemes, extractYoutubeId } from '@/lib/utils'
 
 interface UploadModalProps {
   onClose: () => void
@@ -55,10 +55,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
 
   const removeTag = (tag: string) => {
     setTags(tags.filter(t => t !== tag))
-  }
-  const extractYoutubeId = (url: string) => {
-    const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/(.+)$/)
-    return match ? match[1] : null
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

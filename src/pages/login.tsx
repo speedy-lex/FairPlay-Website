@@ -1,18 +1,16 @@
-// pages/auth.tsx
-
 import React, { useState } from 'react';
 import Head from 'next/head';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/router';
-import Link from 'next/link'; // Import Link for navigation
-import styles from '../components/Layout.module.css'; // Adjust path as needed
+import Link from 'next/link';
+import styles from '../components/Layout.module.css';
 import {
   SearchIcon,
   PlusCircleIcon,
   BellIcon,
-  MenuIcon, // MenuIcon is used for the toggle sidebar button
-} from '../components/icons'; // Adjust path as needed
-import { UserMenu } from '../components/UserMenu'; // Adjust path as needed
+  MenuIcon,
+} from '../components/icons';
+import { UserMenu } from '../components/UserMenu';
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
@@ -68,7 +66,7 @@ export default function Auth() {
       return;
     }
 
-    // upload de la pfp : pas encore implémenté dans la db
+    // pfp upload : not implemented yet
     if (registerPfpFile && data.user) {
       const fileExt = registerPfpFile.name.split('.').pop();
       const fileName = `${data.user.id}.${fileExt}`;
