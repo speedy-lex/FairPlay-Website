@@ -39,6 +39,11 @@ Open `http://localhost:3000` in your browser to see the app.
 - `src/lib/recommend.ts` – suggestion algorithm combining user theme preferences and video ratings
 - `src/app` – Next.js root layout and global styles
 
+## Public API
+
+The application exposes a public API under `/api/v1`. Currently the following endpoint is available:
+- `GET /api/v1/videos` – list all uploaded videos
+
 Videos can have several tags. When uploading, type `/` in the tag field to get suggestions based on existing tags.
 
 Feel free to adapt and extend this project for your own needs.
