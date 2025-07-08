@@ -1,7 +1,7 @@
 import './globals.css'
 import { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Open Stream' }
+export const metadata: Metadata = { title: 'Fair Play' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

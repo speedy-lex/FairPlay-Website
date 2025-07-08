@@ -7,11 +7,24 @@ import { UploadModal } from '@/components/UploadModal'
 import { HomeIcon, SubscriptionsIcon, UserIcon } from '@/components/icons'
 import styles from './HomePage.module.css'
 
+
+
 export default function HomePage() {
   const [showUploadModal, setShowUploadModal] = useState(false)
+
   return (
     <Layout active="home" onCreateClick={() => setShowUploadModal(true)}>
       <section className={`${styles.homeContentSection} custom-scrollbar`}>
+        <nav className={styles.mainNav}>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#features">Our Values</a></li>
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="#extension">Extension</a></li>
+                    <li><a href="#development">Development</a></li>
+                    <li><a href="https://ko-fi.com/openstream" className="btn-donate">Donate</a></li>
+                </ul>
+            </nav>
         <h1 className={styles.heroTitle}>Libérez-vous de l'emprise des réseaux sociaux.</h1>
         <p className={styles.heroSubtitle}>
           Profitez de vidéos et de contenus captivants, gratuitement, pour toujours.

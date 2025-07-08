@@ -116,7 +116,9 @@ export const Layout = ({ children, active = 'home', onCreateClick }: LayoutProps
             </ul>
           </div>
         </aside>
-        {children}
+        <div className={styles.mainContent}>
+          {children}  
+        </div>
       </main>
     </div>
   )

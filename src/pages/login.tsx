@@ -209,7 +209,7 @@ export default function Auth() {
             --background-color:rgb(255, 255, 255); /* Un noir plus profond */
             --card-background:rgb(255, 255, 255); /* Un gris très foncé */
             --text-color:rgb(0, 0, 0);
-            --accent-color: #3dda50; /* Vert accentué */
+            --accent-color: #6a8efb ; /* Vert accentué */
             --border-color: #383838; /* Bordures subtiles */
             --subtle-text:rgb(85, 85, 85); /* Texte secondaire renforcé */
             --hover-card:rgb(255, 255, 255);

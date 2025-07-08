@@ -5,10 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 html, body {
-  margin: 0;
+  margin : 0;
   font-family: 'Roboto', sans-serif;
   height: 100%;
-  overflow: hidden;
+  
   background: #ffffff;
   background-color: #ffffff;
 }
@@ -32,4 +32,17 @@ body {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* globals.css */
+:root {
+    --color-white: #FFFFFF;
+    --color-light-gray: #F0F0F0;
+    --color-medium-gray: #666666;
+    --color-dark-gray: #333333;
+    --color-accent: #6A8EFB;
+    --color-accent-dark: #557CD9;
+    --color-donate-pink: #FF69B4;
+    --color-donate-pink-dark: #E05CA1;
+    --color-text-light: #999999;
 }
