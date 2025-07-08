@@ -75,24 +75,25 @@ export const UserMenu = () => {
           position: absolute;
           top: calc(100% + 0.5rem);
           right: 0;
-          background: #212121;
-          border: 1px solid #333;
+          background:rgb(255, 255, 255);
+          border: 1px solid #333333;
           border-radius: 6px;
           padding: 0.5rem;
           width: 12rem;
           z-index: 20;
         }
         .user-menu-header {
-          border-bottom: 1px solid #333;
+          border-bottom: 1px solid #333333;
           margin-bottom: 0.5rem;
           padding-bottom: 0.25rem;
         }
         .user-name {
           font-weight: 500;
+          color: rgb(58, 58, 58);
         }
         .user-email {
           font-size: 0.875rem;
-          color: #bbb;
+          color:rgb(58, 58, 58);
         }
         .user-menu-item {
           display: block;
@@ -108,6 +109,9 @@ export const UserMenu = () => {
         .user-menu-item:hover {
           background: #333;
         }
+        .user-menu-item {
+          color:rgb(0, 0, 0);
+          }
       `}</style>
     </div>
   )

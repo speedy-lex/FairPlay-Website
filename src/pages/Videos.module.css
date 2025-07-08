@@ -18,15 +18,15 @@
 
 .card {
   position: relative;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #ff0000;
   border-radius: 13px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #ff0000;
   transition: box-shadow 0.2s ease;
   cursor: pointer;
 }
 .card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(255, 27, 27, 0.1);
 }
 
 .media {
@@ -40,8 +40,8 @@
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background-color: #ff0000;
-  color: #fff;
+  background-color: #00ff00;
+  color: #ff0000;
   font-size: 12px;
   font-weight: bold;
   padding: 2px 6px;
@@ -57,18 +57,18 @@
   font-size: 16px;
   font-weight: 600;
   margin: 0 0 8px 0;
-  color: #333;
+  color: #eb0000;
 }
 
 .score {
   font-size: 14px;
-  color: #777;
+  color: #ff0000;
   margin: 0 0 8px 0;
 }
 
 .description {
   font-size: 14px;
-  color: #555;
+  color: #ff0000;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;

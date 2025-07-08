@@ -7,6 +7,7 @@ import { getRecommendedVideos } from '@/lib/recommend'
 import { UploadModal } from '@/components/UploadModal'
 import { Layout } from '@/components/Layout'
 import { ChevronRightIcon } from '@/components/icons'
+import '@/app/globals.css'
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([])
@@ -136,11 +137,6 @@ export default function VideosPage() {
       {showUploadModal && (
         <UploadModal onClose={() => setShowUploadModal(false)} onUploadSuccess={handleUploadSuccess} />
       )}
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        html, body { margin: 0; font-family: 'Roboto', sans-serif; height: 100%; overflow: hidden; }
-        #__next { height: 100%; }
-      `}</style>
       <style jsx>{`
         :global(a) {
           text-decoration: none !important;
@@ -167,6 +163,7 @@ export default function VideosPage() {
           font-weight: 500;
           margin-bottom: 1rem;
           gap: 0.5em;
+          color: #0f0f0f;
         }
         .video-grid-section {
           flex: 1;
@@ -175,11 +172,12 @@ export default function VideosPage() {
           padding: 1rem;
           overflow-y: auto;
           text-decoration: none;
+          background-color:rgb(255, 255, 255);
         }
         .category-filters {
           position: relative;
           z-index: 1;
-          background-color: #0f0f0f;
+          background-color:rgb(255, 252, 252);
           padding: 1rem 0;
           margin-bottom: 1rem;
           max-height: 35px;
@@ -226,9 +224,10 @@ export default function VideosPage() {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
           gap: 1.5rem;
+          background-color: #f0f0f0;
         }
         .card {
-          background-color: #181818;
+          background-color:rgb(255, 255, 255);
           border-radius: 13px;
           overflow: hidden;
           box-shadow: 0 2px 10px rgba(0,0,0,.4);
@@ -239,14 +238,14 @@ export default function VideosPage() {
         }
         .card:hover { transform: translateY(-3px);
           box-shadow: 0 6px 15px rgba(0,0,0,.6);
-          background-color: #2a2a2a;
+          background-color:rgb(167, 167, 167);
         }
         .mediaWrapper {
           position: relative;
           width: 100%;
           padding-top: 56.25%;
           overflow: hidden;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid var(#383838);
         }
         .media {
           position: absolute;
@@ -256,6 +255,7 @@ export default function VideosPage() {
           height: 100%;
           object-fit: cover;
           border-radius: 13px 13px 0px 0px;
+          background-color: #000;
         }
         .tagYT {
           position: absolute;
@@ -274,17 +274,17 @@ export default function VideosPage() {
           font-size: 16px;
           font-weight: 600;
           margin: 0 0 8px;
-          color: #fff;
+          color: #0f0f0f;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-decoration: none;
         }
-        .score { font-size: 14px; color: #aaa; margin: 0 0 8px; }
+        .score { font-size: 14px; color:rgb(82, 81, 81); margin: 0 0 8px; }
         .description {
           font-size: 14px;
-          color: #ccc;
+          color: #0f0f0f;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
@@ -330,7 +330,7 @@ export default function VideosPage() {
           font-size: 1.5rem;
           font-weight: 700;
           margin-bottom: 1rem;
-          color: #fff;
+          color: #0f0f0f;
           position: relative;
           display: inline-block;
         }
@@ -344,8 +344,8 @@ export default function VideosPage() {
           /* background: linear-gradient(to right, #3dda50, #3dda50); */
         }
         .video-tags .theme {
-          background-color: #282828;
-          color: #28a745;
+          background-color:#e0e0e0;
+          color:#6a8efb;
           padding: 4px 8px;
           border-radius: 4px;
           font-size: 0.7em;

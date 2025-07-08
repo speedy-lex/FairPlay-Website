@@ -9,11 +9,14 @@ html, body {
   font-family: 'Roboto', sans-serif;
   height: 100%;
   overflow: hidden;
+  background: #ffffff;
+  background-color: #ffffff;
 }
 
 #__next,
 body {
   height: 100%;
+  background: #ffffff;
 }
 
 /* Custom scrollbar styles */
@@ -21,7 +24,7 @@ body {
   width: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: #ffffff;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #4a4a4a;

@@ -201,7 +201,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
+          background-color: rgba(255, 255, 255, 0.5);
           backdrop-filter: blur(5px);
           display: flex;
           justify-content: center;
@@ -209,7 +209,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
           z-index: 1000;
         }
         .modal-content {
-          background-color: #0f0f0f;
+          background-color:rgb(255, 255, 255);
           border-radius: 13px;
           width: 90%;
           max-width: 500px;
@@ -223,13 +223,13 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
           justify-content: space-between;
           align-items: center;
           padding: 16px;
-          background-color: #212121;
+          background-color:rgb(255, 255, 255);
           border-bottom: 1px solid #333333;
         }
         .modal-header h2 {
           margin: 0;
           font-size: 18px;
-          color: #fff;
+          color:rgb(0, 0, 0);
           font-weight: 500;
         }
         .close-button {
@@ -247,22 +247,22 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
         .modal-textarea {
           width: calc(100% - 24px);
           padding: 12px;
-          background-color: #1a1a1a;
+          background-color:rgb(255, 255, 255);
           border: 1px solid #3e3e3e;
           border-radius: 4px;
-          color: #fff;
+          color: #000000;
           margin-bottom: 8px;
         }
         .modal-textarea { min-height: 80px; resize: vertical; }
         .dropzone {
-          border: 2px dashed #333333;
+          border: 2px dashed rgb(224, 224, 224);
           border-radius: 4px;
           padding: 40px 20px;
           text-align: center;
           cursor: pointer;
           transition: border-color 0.2s, background-color 0.2s;
-          background-color: #000;
-          color: #ccc;
+          background-color:rgb(199, 199, 199);
+          color:rgb(43, 43, 43);
         }
         .dropzone:hover { border-color: #333333; background-color: #0a0a0a; }
         .separator {
@@ -270,7 +270,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
           align-items: center;
           text-align: center;
           margin: 16px 0;
-          color: #aaa;
+          color:rgb(87, 87, 87);
           font-weight: bold;
         }
         .separator::before,
@@ -281,7 +281,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
           margin: 0 10px;
         }
         .youtube-url-input {
-          background-color: #000;
+          background-color:rgb(255, 255, 255);
           border: 1px solid #333333;
         }
         .upload-button {

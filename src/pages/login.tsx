@@ -206,13 +206,13 @@ export default function Auth() {
       </footer>
 
       <style jsx global>{`:root {
-            --background-color: #0f0f0f; /* Un noir plus profond */
-            --card-background: #181818; /* Un gris très foncé */
-            --text-color: #ffffff;
+            --background-color:rgb(255, 255, 255); /* Un noir plus profond */
+            --card-background:rgb(255, 255, 255); /* Un gris très foncé */
+            --text-color:rgb(0, 0, 0);
             --accent-color: #3dda50; /* Vert accentué */
             --border-color: #383838; /* Bordures subtiles */
-            --subtle-text: #9e9e9e; /* Texte secondaire renforcé */
-            --hover-card: #2a2a2a;
+            --subtle-text:rgb(85, 85, 85); /* Texte secondaire renforcé */
+            --hover-card:rgb(255, 255, 255);
             --danger-color: #dc3545;
         }
 
