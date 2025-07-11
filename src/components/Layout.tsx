@@ -19,7 +19,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './layoutStyle.css';
 
-// Props pour Layout : page active, callback création et enfants
 type Props = {
   active: string;
   onCreateClick: () => void;
@@ -29,7 +28,7 @@ type Props = {
 const TopbarSidebar: React.FC<Props> = ({ active, onCreateClick, children }) => (
   <>
     <Head>
-      {/* Meta, titre, favicon, etc. */}
+      {/* */}
       <></>
     </Head>
 
