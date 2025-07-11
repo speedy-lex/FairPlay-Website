@@ -9,6 +9,10 @@ export default function VideoDetailPage() {
   const router = useRouter()
   const { id } = router.query
 
+  const handleCreateClick = () => {
+    router.push('/videos/create')
+  }
+
   const [video, setVideo] = useState<Video | null>(null)
   const [userRating, setUserRating] = useState<number>(0)
   const [loading, setLoading] = useState(true)
@@ -68,7 +72,7 @@ export default function VideoDetailPage() {
   }
 
   return (
-    <Layout active="videos">
+    <Layout active="videos" onCreateClick={handleCreateClick}>
       <div className="video-detail-container custom-scrollbar">
         {loading && <p className="text-center">Chargement...</p>}
         {error && <p className="text-red-500 text-center">Erreur : {error}</p>}
