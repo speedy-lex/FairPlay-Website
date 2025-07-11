@@ -7,8 +7,6 @@ import { UploadModal } from '@/components/UploadModal'
 import { HomeIcon, SubscriptionsIcon, UserIcon } from '@/components/icons'
 import styles from './HomePage.module.css'
 
-
-
 export default function HomePage() {
   const [showUploadModal, setShowUploadModal] = useState(false)
 
