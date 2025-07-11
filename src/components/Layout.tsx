@@ -14,20 +14,23 @@ import {
   faUserCircle,
   faAward,
   faBookOpen,
-  faGamepad
+  faGamepad,
+  faPlus
 } from '@fortawesome/free-solid-svg-icons';
 import './layoutStyle.css';
 
+// Props pour Layout : page active, callback création et enfants
 type Props = {
+  active: string;
+  onCreateClick: () => void;
   children?: React.ReactNode;
 };
 
-const TopbarSidebar: React.FC<Props> = ({ children }) => (
+const TopbarSidebar: React.FC<Props> = ({ active, onCreateClick, children }) => (
   <>
     <Head>
-      {/* ... */}
-      <>
-      </>
+      {/* Meta, titre, favicon, etc. */}
+      <></>
     </Head>
 
     {/* Topbar */}
@@ -47,15 +50,38 @@ const TopbarSidebar: React.FC<Props> = ({ children }) => (
         </div>
         <nav className="main-nav">
           <ul>
-            <li><a href="#">Accueil</a></li>
-            <li><a href="/videos" className="active">Recommandations</a></li>
-            <li><a href="#">Explorer</a></li>
-            <li><a href="#">S'abonner</a></li>
-            <li><a href="#">Ma Chaîne</a></li>
+            <li>
+              <a href="/" className={active === 'home' ? 'active' : ''}>
+                Accueil
+              </a>
+            </li>
+            <li>
+              <a href="/videos" className={active === 'videos' ? 'active' : ''}>
+                Recommandations
+              </a>
+            </li>
+            <li>
+              <a href="/explore" className={active === 'explore' ? 'active' : ''}>
+                Explorer
+              </a>
+            </li>
+            <li>
+              <a href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
+                S'abonner
+              </a>
+            </li>
+            <li>
+              <a href="/channel" className={active === 'channel' ? 'active' : ''}>
+                Ma Chaîne
+              </a>
+            </li>
           </ul>
         </nav>
         <div className="header-actions">
           <button className="donate-button">Faire un don</button>
+          <button className="create-button" onClick={onCreateClick}>
+            <FontAwesomeIcon icon={faPlus} /> Créer
+          </button>
         </div>
       </div>
     </header>
@@ -66,65 +92,54 @@ const TopbarSidebar: React.FC<Props> = ({ children }) => (
         <nav className="sidebar-nav">
           <ul>
             <li>
-              <a href="#">
-                <FontAwesomeIcon icon={faHome} className="sidebarIcon"/> Accueil
+              <a href="/" className={active === 'home' ? 'active' : ''}>
+                <FontAwesomeIcon icon={faHome} className="sidebarIcon" /> Accueil
               </a>
             </li>
             <li>
-              <a href="/videos" className="active">
-                <FontAwesomeIcon icon={faCompass} className="sidebarIcon"/> Recommandations
+              <a href="/videos" className={active === 'videos' ? 'active' : ''}>
+                <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Recommandations
               </a>
             </li>
             <li>
-              <a href="#">
-                <FontAwesomeIcon icon={faGlobe} className="sidebarIcon"/> Explorer
+              <a href="/explore" className={active === 'explore' ? 'active' : ''}>
+                <FontAwesomeIcon icon={faGlobe} className="sidebarIcon" /> Explorer
               </a>
             </li>
             <li>
-              <a href="#">
-                <FontAwesomeIcon icon={faBell} className="sidebarIcon"/> Abonnements
+              <a href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
+                <FontAwesomeIcon icon={faBell} className="sidebarIcon" /> Abonnements
               </a>
             </li>
             <li>
-              <a href="#">
-                <FontAwesomeIcon icon={faHistory} className="sidebarIcon"/> Historique
+              <a href="/history" className={active === 'history' ? 'active' : ''}>
+                <FontAwesomeIcon icon={faHistory} className="sidebarIcon" /> Historique
               </a>
             </li>
             <li>
-              <a href="#">
-                <FontAwesomeIcon icon={faUserCircle} className="sidebarIcon"/> Ma Chaîne
+              <a href="/channel" className={active === 'channel' ? 'active' : ''}>
+                <FontAwesomeIcon icon={faUserCircle} className="sidebarIcon" /> Ma Chaîne
               </a>
             </li>
           </ul>
 
+          {/* Sections supplémentaires */}
           <div className="sidebar-section">
             <h4>Abonnements</h4>
             <ul>
               <li>
                 <a href="#">
-                  <img
-                    src="https://via.placeholder.com/24x24?text=C1"
-                    alt="Icône chaîne"
-                  />{' '}
-                  Chaîne 1
+                  <img src="https://via.placeholder.com/24x24?text=C1" alt="Chaîne 1" /> Chaîne 1
                 </a>
               </li>
               <li>
                 <a href="#">
-                  <img
-                    src="https://via.placeholder.com/24x24?text=C2"
-                    alt="Icône chaîne"
-                  />{' '}
-                  Chaîne 2
+                  <img src="https://via.placeholder.com/24x24?text=C2" alt="Chaîne 2" /> Chaîne 2
                 </a>
               </li>
               <li>
                 <a href="#">
-                  <img
-                    src="https://via.placeholder.com/24x24?text=C3"
-                    alt="Icône chaîne"
-                  />{' '}
-                  Chaîne 3
+                  <img src="https://via.placeholder.com/24x24?text=C3" alt="Chaîne 3" /> Chaîne 3
                 </a>
               </li>
             </ul>
@@ -134,13 +149,19 @@ const TopbarSidebar: React.FC<Props> = ({ children }) => (
             <h4>Plus de FairPlay</h4>
             <ul>
               <li>
-                <a href="#"><FontAwesomeIcon icon={faAward} className="sidebarIcon"/> Populaire</a>
+                <a href="#" className={active === 'popular' ? 'active' : ''}>
+                  <FontAwesomeIcon icon={faAward} className="sidebarIcon" /> Populaire
+                </a>
               </li>
               <li>
-                <a href="#"><FontAwesomeIcon icon={faBookOpen} className="sidebarIcon"/> Apprentissage</a>
+                <a href="#" className={active === 'learning' ? 'active' : ''}>
+                  <FontAwesomeIcon icon={faBookOpen} className="sidebarIcon" /> Apprentissage
+                </a>
               </li>
               <li>
-                <a href="#"><FontAwesomeIcon icon={faGamepad} className="sidebarIcon"/> Gaming</a>
+                <a href="#" className={active === 'gaming' ? 'active' : ''}>
+                  <FontAwesomeIcon icon={faGamepad} className="sidebarIcon" /> Gaming
+                </a>
               </li>
             </ul>
           </div>
