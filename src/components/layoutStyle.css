@@ -1,0 +1,439 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+:root {
+    --color-white: #FFFFFF;
+    --color-light-gray: #F0F0F0;
+    --color-medium-gray: #666666;
+    --color-dark-gray: #333333;
+    --color-accent: #6A8EFB;
+    --color-accent-dark: #557CD9;
+    --color-donate-pink: #FF69B4;
+    --color-donate-pink-dark: #E05CA1;
+    --color-text-light: #999999;
+}
+
+/* Base Styles */
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-light-gray);
+    color: var(--color-dark-gray);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px; /* Largeur conservée pour l'ensemble */
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-accent);
+}
+
+a:hover {
+    color: var(--color-accent-dark);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-dark-gray);
+    margin-top: 0;
+    font-weight: 600;
+}
+
+p {
+    margin-bottom: 1em;
+}
+
+/* Header */
+.main-header {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-light-gray);
+    padding: 12px 0; /* Padding légèrement réduit */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo {
+    margin: 0;
+    font-size: 1.7em; /* Taille du logo légèrement réduite */
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.logo a {
+    color: var(--color-dark-gray);
+}
+
+.sidebarIcon {
+    margin-right: 12px;
+    font-size: 1.05em; /* Taille d'icône légèrement réduite */
+    color: var(--color-medium-gray);
+}
+.sidebar-nav ul li a.active .sidebarIcon {
+    color: var(--color-accent);
+}
+/* Search Bar */
+.search-bar {
+    display: flex;
+    flex-grow: 1;
+    max-width: 600px;
+    border: 1px solid var(--color-light-gray);
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: var(--color-white);
+}
+
+.search-bar input[type="text"] {
+    border: none;
+    padding: 9px 15px; /* Padding ajusté */
+    font-size: 0.95em; /* Taille de police ajustée */
+    outline: none;
+    flex-grow: 1;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--color-dark-gray);
+}
+
+.search-bar button {
+    background-color: var(--color-light-gray);
+    border: none;
+    padding: 9px 15px; /* Padding ajusté */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: var(--color-medium-gray);
+    font-size: 0.95em; /* Taille de police ajustée */
+}
+
+.search-bar button:hover {
+    background-color: var(--color-medium-gray);
+    color: var(--color-white);
+}
+
+/* Navigation Principale (Header - toujours masquée ici) */
+.main-nav {
+    display: none;
+}
+
+.donate-button {
+    background-color: var(--color-donate-pink);
+    color: var(--color-white);
+    border: none;
+    padding: 9px 18px; /* Padding réduit */
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    font-size: 0.9em; /* Taille de police réduite */
+}
+
+.donate-button:hover {
+    background-color: var(--color-donate-pink-dark);
+}
+
+/* Page Wrapper for Sidebar and Main Content */
+.page-wrapper {
+    display: flex;
+    padding-top: 25px; /* Espace plus généreux sous le header */
+}
+
+/* Sidebar */
+.sidebar {
+    width: 230px; /* Largeur légèrement réduite pour la sidebar */
+    flex-shrink: 0;
+    background-color: var(--color-white);
+    border-right: 1px solid var(--color-light-gray);
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    align-self: flex-start;
+    position: sticky;
+    top: 75px; /* Ajusté pour le padding du header */
+    height: calc(100vh - 95px); /* Hauteur calculée */
+    overflow-y: auto;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-nav li a {
+    display: flex;
+    align-items: center;
+    padding: 9px 20px; /* Padding ajusté */
+    color: #666666;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9em; /* Taille de police légèrement plus petite */
+}
+
+.sidebar-nav li a i {
+    margin-right: 12px; /* Marge ajustée */
+    font-size: 1.05em; /* Taille d'icône légèrement plus petite */
+    color: var(--color-medium-gray);
+}
+
+.sidebar-nav li a.active {
+    background-color: var(--color-light-gray);
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.sidebar-nav li a.active i {
+    color: var(--color-accent);
+}
+
+.sidebar-nav li a:hover:not(.active) {
+    background-color: var(--color-light-gray);
+}
+
+.sidebar-section {
+    border-top: 1px solid var(--color-light-gray);
+    padding: 15px 0; /* Padding réduit */
+    margin-top: 15px; /* Marge réduite */
+}
+
+.sidebar-section h4 {
+    font-size: 0.85em; /* Taille de police réduite */
+    color: var(--color-medium-gray);
+    padding: 0 20px 8px; /* Padding ajusté */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sidebar-section ul li a {
+    padding-left: 20px;
+    font-size: 0.85em; /* Taille de police réduite */
+}
+
+.sidebar-section ul li a img {
+    width: 22px; /* Taille d'image réduite */
+    height: 22px; /* Taille d'image réduite */
+    border-radius: 50%;
+    margin-right: 12px; /* Marge ajustée */
+    object-fit: cover;
+}
+
+
+/* Main Content Area */
+.main-content {
+    flex-grow: 1;
+    margin-left: 30px; /* Espace plus généreux entre la sidebar et le contenu principal */
+}
+
+/* Footer */
+.main-footer {
+    background-color: var(--color-dark-gray);
+    color: var(--color-white);
+    padding: 20px 0; /* Padding réduit */
+    text-align: center;
+    margin-top: 40px;
+}
+
+.main-footer .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-footer p {
+    margin: 0 0 10px 0; /* Marge réduite */
+    font-size: 0.8em; /* Taille de police réduite */
+    color: var(--color-text-light);
+}
+
+.footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-links li {
+    margin: 0 10px; /* Marge réduite */
+}
+
+.footer-links li a {
+    color: var(--color-text-light);
+    font-size: 0.8em; /* Taille de police réduite */
+    transition: color 0.3s ease;
+}
+
+.footer-links li a:hover {
+    color: var(--color-white);
+}
+
+@media (max-width: 1024px) and (min-width: 768px) {
+  /* --- Sidebar réduite à 60px --- */
+  .sidebar {
+    width: 60px;
+    padding: 15px 0;
+  }
+
+  /* --- On passe la <ul> en flex-colonne --- */
+  .sidebar-nav ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Chaque item fait la largeur de la sidebar */
+  .sidebar-nav ul li {
+    width: 100%;
+  }
+
+  /* Le lien ne contient plus que l’icône, centré */
+  .sidebar-nav ul li a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 12px 0;
+    font-size: 0;           /* masque tout texte direct */
+    color: transparent;     /* par sécurité */
+  }
+
+  /* Icônes visibles, centrées et dimensionnées */
+  /* Si tu utilises <i class="sidebarIcon">…</i> : */
+  .sidebar-nav ul li a .sidebarIcon,
+  /* Si tu utilises des <i> ou des <svg> directement : */
+  .sidebar-nav ul li a i,
+  .sidebar-nav ul li a svg {
+    display: block;
+    font-size: 1.5rem;      /* ajuste à ta grille */
+    margin: 0;
+    color: var(--color-medium-gray);
+  }
+
+  /* On cache tous les <span> de texte dans les liens */
+  .sidebar-nav ul li a span {
+    display: none;
+  }
+
+  /* Si tu veux aussi masquer les sections secondaires */
+  .sidebar-section {
+    display: none;
+  }
+
+  /* Décale un peu le contenu principal */
+  .main-content {
+    margin-left: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+    .main-header .container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .logo {
+        flex-basis: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .search-bar {
+        order: 3;
+        flex-basis: 100%;
+        max-width: none;
+    }
+
+    .main-nav {
+        display: none;
+    }
+
+    .donate-button {
+        order: 2;
+    }
+
+    .page-wrapper {
+        flex-direction: column;
+        padding-top: 15px;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--color-light-gray);
+        margin-bottom: 20px;
+        box-shadow: none;
+        border-radius: 0;
+        padding-bottom: 0;
+    }
+
+    .sidebar-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .sidebar-nav li {
+        flex: 1 1 auto;
+        max-width: 33%;
+        text-align: center;
+    }
+
+    .sidebar-nav li a {
+        flex-direction: column;
+        padding: 10px 5px;
+        font-size: 0.85em;
+    }
+
+    .sidebar-nav li a span {
+        display: block;
+        margin-top: 5px;
+    }
+
+    .sidebar-nav li a i {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-section {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0 10px;
+    }
+
+    .hero-section {
+        padding: 30px 20px;
+    }
+
+    .hero-section h2 {
+        font-size: 1.8em;
+    }
+
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-links li {
+        margin: 0 8px;
+    }
+}
