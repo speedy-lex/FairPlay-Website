@@ -115,12 +115,16 @@ export default function Auth() {
           </Link>
         </div>
         <div className={styles.searchBarContainer}>
-          <input type="text" placeholder="Rechercher..." className="Layout_searchInput__F3Qmq" />
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            className={styles.searchInput}
+          />
           <button className={styles.searchButton} aria-label="Search">
             <SearchIcon />
           </button>
         </div>
-        <div className="Layout_rightIcons__8R_ss">
+        <div className={styles.rightIcons}>
           <button className={styles.iconButton} aria-label="Create video">
             <PlusCircleIcon />
           </button>

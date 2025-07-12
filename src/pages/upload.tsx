@@ -57,12 +57,12 @@ export default function Upload() {
     try {
       // get user to add user_id
       const { data: { user }, error: userError } = await supabase.auth.getUser()
-      if (userError || !user) throw new Error('Utilisateur non authentifié')
+      if (userError || !user) throw new Error('Unauthenticated user')
 
       let videoData: any = { title, description, themes: tags, user_id: user.id }
       if (youtubeUrl) {
         const id = extractYoutubeId(youtubeUrl)
-        if (!id) throw new Error('URL YouTube invalide')
+        if (!id) throw new Error('Invalid YouTube URL')
         videoData = { ...videoData, type: 'youtube', youtube_id: id }
       } else if (file) {
         const fileName = `${Date.now()}_${file.name}`
@@ -74,7 +74,7 @@ export default function Upload() {
         const { data: { publicUrl } } = supabase.storage.from('videos').getPublicUrl(data.path)
         videoData = { ...videoData, type: 'native', url: publicUrl }
       } else {
-        throw new Error('Fichier ou URL YouTube requis')
+        throw new Error('File or YouTube URL required')
       }
 
       const { error: dbError } = await supabase
@@ -89,7 +89,7 @@ export default function Upload() {
 
   return (
     <div className="max-w-lg mx-auto mt-10">
-      <h1 className="text-2xl mb-4">Upload d'une vidéo</h1>
+      <h1 className="text-2xl mb-4">Uploading a video</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           className="border p-2"
@@ -149,14 +149,14 @@ export default function Upload() {
         <div {...getRootProps()} className="border-dashed border-2 p-6 text-center">
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p>Déposez la vidéo ici...</p>
+            <p>Drop the video here...</p>
           ) : (
-            <p>Glissez-déposez un fichier vidéo, ou cliquez pour sélectionner</p>
+            <p>Drag and drop a video file, or click to select</p>
           )}
-          {file && <p className="mt-2">Fichier sélectionné : {file.name}</p>}
+          {file && <p className="mt-2">Selected file : {file.name}</p>}
         </div>
 
-        <div className="text-center my-2">-- OU --</div>
+        <div className="text-center my-2">-- OR --</div>
 
         <input
           className="border p-2"
@@ -167,7 +167,7 @@ export default function Upload() {
         />
 
         {error && <p className="text-red-500">{error}</p>}
-        <button className="bg-green-600 text-white py-2 rounded-lg">Publier</button>
+        <button className="bg-green-600 text-white py-2 rounded-lg">Publish</button>
       </form>
     </div>
   )
