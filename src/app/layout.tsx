@@ -1,4 +1,6 @@
 import './globals.css'
+import '@/lib/fontawesome'
+import '@/components/layoutStyle.css'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Fair Play' }
