@@ -8,15 +8,11 @@ html, body {
   margin : 0;
   font-family: 'Roboto', sans-serif;
   height: 100%;
-  
-  background: #ffffff;
-  background-color: #ffffff;
 }
 
 #__next,
 body {
   height: 100%;
-  background: #ffffff;
 }
 
 /* Custom scrollbar styles */
