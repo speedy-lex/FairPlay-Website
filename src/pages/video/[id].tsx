@@ -1,9 +1,11 @@
 "use client"
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '@/lib/supabase'
 import type { Video } from '@/types'
-import { Layout } from '@/components/Layout'
+import { Topbar } from '@/components/Topbar'
+import { Sidebar } from '@/components/Sidebar'
 
 export default function VideoDetailPage() {
   const router = useRouter()
@@ -72,47 +74,53 @@ export default function VideoDetailPage() {
   }
 
   return (
-    <Layout active="videos" onCreateClick={handleCreateClick}>
-      <div className="video-detail-container custom-scrollbar">
-        {loading && <p className="text-center">Chargement...</p>}
-        {error && <p className="text-red-500 text-center">Erreur : {error}</p>}
-        {!loading && video && (
-          <>
-            <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
-            <div className="mb-6">
-              {video.type === 'youtube' && video.youtube_id ? (
-                <iframe
-                  width="100%"
-                  height="400"
-                  src={`https://www.youtube.com/embed/${video.youtube_id}`}
-                  frameBorder="0"
-                  allowFullScreen
-                />
-              ) : (
-                video.url && <video className="w-full h-96" controls src={video.url} />
-              )}
-            </div>
-            <p className="mb-4">{video.description}</p>
-            <div className="mb-4">
-              <p className="font-medium">
-                Note moyenne : {video.quality_score != null ? video.quality_score.toFixed(1) : 'N/A'} / 5
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <span>Ta note :</span>
-              {[1, 2, 3, 4, 5].map(n => (
-                <button
-                  key={n}
-                  onClick={() => handleRate(n)}
-                  className={`px-3 py-1 rounded ${n <= userRating ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700'}`}
-                >
-                  {n}⭐
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+    <>
+      <Topbar active="videos" onCreateClick={handleCreateClick} />
+      <div className="page-wrapper container">
+        <Sidebar active="videos" />
+        <main className="main-content">
+          <div className="video-detail-container custom-scrollbar">
+            {loading && <p className="text-center">Chargement...</p>}
+            {error && <p className="text-red-500 text-center">Erreur : {error}</p>}
+            {!loading && video && (
+              <>
+                <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
+                <div className="mb-6">
+                  {video.type === 'youtube' && video.youtube_id ? (
+                    <iframe
+                      width="100%"
+                      height="400"
+                      src={`https://www.youtube.com/embed/${video.youtube_id}`}
+                      frameBorder="0"
+                      allowFullScreen
+                    />
+                  ) : (
+                    video.url && <video className="w-full h-96" controls src={video.url} />
+                  )}
+                </div>
+                <p className="mb-4">{video.description}</p>
+                <div className="mb-4">
+                  <p className="font-medium">
+                    Note moyenne : {video.quality_score != null ? video.quality_score.toFixed(1) : 'N/A'} / 5
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Ta note :</span>
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => handleRate(n)}
+                      className={`px-3 py-1 rounded ${n <= userRating ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700'}`}
+                    >
+                      {n}⭐
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </main>
       </div>
-    </Layout>
+    </>
   )
 }
