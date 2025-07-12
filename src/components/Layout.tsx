@@ -36,12 +36,12 @@ const TopbarSidebar: React.FC<Props> = ({ active, onCreateClick, children }) => 
     <header className="main-header">
       <div className="container">
         <h1 className="logo">
-          <a href="/">FairPlay</a>
+          <a href="https://newstreamteam.github.io/NewStream-Main/">FairPlay</a>
         </h1>
         <div className="search-bar">
           <input
             type="text"
-            placeholder="Rechercher des vidéos éthiques..."
+            placeholder="Search videos..."
           />
           <button type="submit">
             <FontAwesomeIcon icon={faSearch} />
@@ -51,35 +51,35 @@ const TopbarSidebar: React.FC<Props> = ({ active, onCreateClick, children }) => 
           <ul>
             <li>
               <a href="/" className={active === 'home' ? 'active' : ''}>
-                Accueil
+                Home
               </a>
             </li>
             <li>
               <a href="/videos" className={active === 'videos' ? 'active' : ''}>
-                Recommandations
+                Feed
               </a>
             </li>
             <li>
               <a href="/explore" className={active === 'explore' ? 'active' : ''}>
-                Explorer
+                Explore
               </a>
             </li>
             <li>
               <a href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
-                S'abonner
+                Subscriptions
               </a>
             </li>
             <li>
               <a href="/channel" className={active === 'channel' ? 'active' : ''}>
-                Ma Chaîne
+                My Channel
               </a>
             </li>
           </ul>
         </nav>
         <div className="header-actions">
-          <button className="donate-button">Faire un don</button>
+          <button className="donate-button">Donate</button>
           <button className="create-button" onClick={onCreateClick}>
-            <FontAwesomeIcon icon={faPlus} /> Créer
+            <FontAwesomeIcon icon={faPlus} /> Create
           </button>
         </div>
       </div>
@@ -92,32 +92,32 @@ const TopbarSidebar: React.FC<Props> = ({ active, onCreateClick, children }) => 
           <ul>
             <li>
               <a href="/" className={active === 'home' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faHome} className="sidebarIcon" /> Accueil
+                <FontAwesomeIcon icon={faHome} className="sidebarIcon" /> Home
               </a>
             </li>
             <li>
               <a href="/videos" className={active === 'videos' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Recommandations
+                <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Feed
               </a>
             </li>
             <li>
               <a href="/explore" className={active === 'explore' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faGlobe} className="sidebarIcon" /> Explorer
+                <FontAwesomeIcon icon={faGlobe} className="sidebarIcon" /> Explore
               </a>
             </li>
             <li>
               <a href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faBell} className="sidebarIcon" /> Abonnements
+                <FontAwesomeIcon icon={faBell} className="sidebarIcon" /> Subscriptions
               </a>
             </li>
             <li>
               <a href="/history" className={active === 'history' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faHistory} className="sidebarIcon" /> Historique
+                <FontAwesomeIcon icon={faHistory} className="sidebarIcon" /> History
               </a>
             </li>
             <li>
               <a href="/channel" className={active === 'channel' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faUserCircle} className="sidebarIcon" /> Ma Chaîne
+                <FontAwesomeIcon icon={faUserCircle} className="sidebarIcon" /> My Channel
               </a>
             </li>
           </ul>
@@ -128,17 +128,17 @@ const TopbarSidebar: React.FC<Props> = ({ active, onCreateClick, children }) => 
             <ul>
               <li>
                 <a href="#">
-                  <img src="https://via.placeholder.com/24x24?text=C1" alt="Chaîne 1" /> Chaîne 1
+                  <img src="https://via.placeholder.com/24x24?text=C1" alt="Chaîne 1" /> Channel 1
                 </a>
               </li>
               <li>
                 <a href="#">
-                  <img src="https://via.placeholder.com/24x24?text=C2" alt="Chaîne 2" /> Chaîne 2
+                  <img src="https://via.placeholder.com/24x24?text=C2" alt="Chaîne 2" /> Channel 2
                 </a>
               </li>
               <li>
                 <a href="#">
-                  <img src="https://via.placeholder.com/24x24?text=C3" alt="Chaîne 3" /> Chaîne 3
+                  <img src="https://via.placeholder.com/24x24?text=C3" alt="Chaîne 3" /> Channel 3
                 </a>
               </li>
             </ul>
@@ -149,12 +149,12 @@ const TopbarSidebar: React.FC<Props> = ({ active, onCreateClick, children }) => 
             <ul>
               <li>
                 <a href="#" className={active === 'popular' ? 'active' : ''}>
-                  <FontAwesomeIcon icon={faAward} className="sidebarIcon" /> Populaire
+                  <FontAwesomeIcon icon={faAward} className="sidebarIcon" /> Trending
                 </a>
               </li>
               <li>
                 <a href="#" className={active === 'learning' ? 'active' : ''}>
-                  <FontAwesomeIcon icon={faBookOpen} className="sidebarIcon" /> Apprentissage
+                  <FontAwesomeIcon icon={faBookOpen} className="sidebarIcon" /> Learning
                 </a>
               </li>
               <li>
