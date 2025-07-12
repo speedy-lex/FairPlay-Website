@@ -3,14 +3,7 @@ import Head from 'next/head';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import styles from '../components/Layout.module.css';
-import {
-  SearchIcon,
-  PlusCircleIcon,
-  BellIcon,
-  MenuIcon,
-} from '../components/icons';
-import { UserMenu } from '../components/UserMenu';
+import { Topbar } from '@/components/Topbar';
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
@@ -30,10 +23,6 @@ export default function Auth() {
   const [registerError, setRegisterError] = useState('');
 
   const router = useRouter();
-
-  // State for the sidebar collapse, matching Layout.tsx
-  const [collapsed, setCollapsed] = useState(false);
-
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,42 +87,7 @@ export default function Auth() {
         />
       </Head>
 
-      {/* Replaced the existing header with the structure from Layout.tsx */}
-      <header className={styles.header}>
-        <div className={styles.logoSection}>
-          {/* Add a button for toggling the sidebar, similar to Layout.tsx */}
-          <button className={styles.menuButton} onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
-            <MenuIcon />
-          </button>
-          <Link href="/" className={styles.logoSection} >
-            <img
-              src="/horitontal_tree_adapted.png"
-              alt="OpenStream Logo"
-              className={styles.logoImg}
-              onError={e => { const t = e.currentTarget; t.onerror = null; t.src = 'https://placehold.co/32x32/FF0000/FFFFFF?text=OS' }}
-            />
-          </Link>
-        </div>
-        <div className={styles.searchBarContainer}>
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            className={styles.searchInput}
-          />
-          <button className={styles.searchButton} aria-label="Search">
-            <SearchIcon />
-          </button>
-        </div>
-        <div className={styles.rightIcons}>
-          <button className={styles.iconButton} aria-label="Create video">
-            <PlusCircleIcon />
-          </button>
-          <button className={styles.iconButton} aria-label="Notifications">
-            <BellIcon />
-          </button>
-          <UserMenu />
-        </div>
-      </header>
+      <Topbar active="home" />
 
       <main className="auth-container">
         <div className="auth-card">

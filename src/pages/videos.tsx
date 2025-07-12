@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getRecommendedVideos } from '@/lib/recommend';
-import { Layout } from '@/components/Layout';
+import { Topbar } from '@/components/Topbar';
+import { Sidebar } from '@/components/Sidebar';
 import { UploadModal } from '@/components/UploadModal';
 import { VideoGridSection } from '@/components/VideoGridSection';
 import { fetchYoutubeDuration, parseISODuration } from '@/utils/videoHelpers';
@@ -67,20 +68,26 @@ export default function VideosPage() {
     : videos.filter(v => parseThemes((v as any).themes).includes(selectedCategory));
 
   return (
-    <Layout active="videos" onCreateClick={() => setShowUploadModal(true)}>
-      <VideoGridSection
-        loading={loading}
-        error={error}
-        categories={categories}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        filteredVideos={filteredVideos}
-        parseISODuration={parseISODuration}
-        parseThemes={parseThemes}
-      />
+    <>
+      <Topbar active="videos" onCreateClick={() => setShowUploadModal(true)} />
+      <div className="page-wrapper container">
+        <Sidebar active="videos" />
+        <main className="main-content">
+          <VideoGridSection
+            loading={loading}
+            error={error}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            filteredVideos={filteredVideos}
+            parseISODuration={parseISODuration}
+            parseThemes={parseThemes}
+          />
+        </main>
+      </div>
       {showUploadModal && (
         <UploadModal onClose={() => setShowUploadModal(false)} onUploadSuccess={handleUploadSuccess} />
       )}
-    </Layout>
+    </>
   );
 }
