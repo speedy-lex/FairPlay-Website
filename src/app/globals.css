@@ -1,18 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
 html, body {
-  margin : 0;
-  font-family: 'Roboto', sans-serif;
+  margin: 0!important;
   height: 100%;
+  font-family: 'Montserrat', sans-serif;
+  background: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 #__next,
 body {
   height: 100%;
+  background: #f0f0f0;
+  margin: 0px !important;
 }
 
 /* Custom scrollbar styles */
