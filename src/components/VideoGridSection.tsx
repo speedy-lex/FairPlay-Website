@@ -26,7 +26,7 @@ export function VideoGridSection({
 }: VideoGridSectionProps) {
   return (
     <section className="video-grid-section custom-scrollbar">
-      {/*<h1 className="category-heading">Explorer les vidéos</h1>*/}
+      {/*<h1 className="category-heading">Explore videos</h1>*/}
       <div className="category-filters">
         {categories.map(category => (
           <button
@@ -40,19 +40,11 @@ export function VideoGridSection({
         <button className="category-scroll-button"><ChevronRightIcon /></button>
       </div>
       {loading ? (
-        <p className="video-meta">Chargement des vidéos…</p>
+        <p className="video-meta">Loading…</p>
       ) : error ? (
-        <p className="video-meta video-error">Erreur : {error}</p>
+        <p className="video-meta video-error">Error : {error}</p>
       ) : (
         <>
-          <h2 className="section-title">
-            <span className="icon-info">
-              <svg viewBox="0 0 25 25" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-              </svg>
-            </span>
-            Contenus Recommandés
-          </h2>
           <div className="video-grid">
             {filteredVideos.map(video => (
               <Link key={video.id} href={`/video/${video.id}`} legacyBehavior>
@@ -91,13 +83,14 @@ export function VideoGridSection({
         </>
       )}
       <style jsx>{`
-        :global(body) { margin: 0; background-color: #f0f0f0; color: #333333;}
         .video-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr); /* 3 columns by default for larger screens */
-          gap: 20px; /* Space between cards */
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          width: 100%;
+          max-width: 100%;
+          overflow-x: hidden;
         }
-        
         .card {
           display: flex;
           flex-direction: column;
@@ -116,10 +109,10 @@ export function VideoGridSection({
         .mediaWrapper {
           position: relative;
           width: 100%;
-          padding-top: 56.25%; /* 16:9 aspect ratio */
-          background-color: #f0f0f0; /* Placeholder background */
-          border-radius: 10px 10px 0 0; /* Match card radius for the top corners */
-          overflow: hidden; /* Ensure content respects border-radius */
+          padding-top: 56.25%;
+          background-color: #f0f0f0;
+          border-radius: 10px 10px 0 0; 
+          overflow: hidden;
         }
 
         .media {
@@ -135,7 +128,7 @@ export function VideoGridSection({
           position: absolute;
           top: 8px;
           left: 8px;
-          background-color: #ff0000; /* YouTube red */
+          background-color: #ff0000;
           color: white;
           padding: 4px 8px;
           border-radius: 4px;
@@ -148,7 +141,7 @@ export function VideoGridSection({
           position: absolute;
           bottom: 8px;
           right: 8px;
-          background-color: rgba(0, 0, 0, 0.7); /* Darker, semi-transparent background */
+          background-color: rgba(0, 0, 0, 0.7);
           color: var(--color-white);
           padding: 4px 8px;
           border-radius: 4px;
@@ -171,7 +164,7 @@ export function VideoGridSection({
           margin-bottom: 8px;
           line-height: 1.3;
           display: -webkit-box;
-          -webkit-line-clamp: 2; /* Limit to 2 lines */
+          -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -188,7 +181,7 @@ export function VideoGridSection({
           color: #606060;
           margin-bottom: 10px;
           display: -webkit-box;
-          -webkit-line-clamp: 2; /* Limit description to 2 lines */
+          -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -198,7 +191,7 @@ export function VideoGridSection({
           display: flex;
           flex-wrap: wrap;
           gap: 5px;
-          margin-top: auto; /* Push tags to the bottom */
+          margin-top: auto;
         }
 
         .theme {
@@ -210,107 +203,97 @@ export function VideoGridSection({
           margin-bottom: 0px;
           margin-top: 5px;
         }
-        /* Global reset for links within this scope, ensure they don't have underlines */
+
         :global(a) { text-decoration: none !important; }
         
-        /* Icon information (e.g., watch count, duration icon) */
         .icon-info {
           display: inline-flex;
           vertical-align: middle;
-          margin-right: 0.5em; /* Spacing between icon and text */
+          margin-right: 0.5em;
         }
 
-        /* Styling for SVG icons within .icon-info */
         .icon-info svg {
           width: 1em;
           height: 1em;
-          color: var(--color-accent); /* Use accent color for icons */
+          color: var(--color-accent);
         }
 
-        /* Section title styling */
         .section-title {
           display: flex;
           align-items: center;
-          font-size: 1.5rem; /* Slightly larger for professionalism */
-          font-weight: 700; /* Bolder */
-          margin-bottom: 1.5rem; /* More space below the title */
-          gap: 0.75em; /* Space between icon and text if present */
-          color: var(--color-dark-gray); /* Consistent dark text */
-          font-family: 'Montserrat', sans-serif; /* Consistent heading font */
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin-bottom: 1.5rem;
+          gap: 0.75em;
+          color: var(--color-dark-gray);
+          font-family: 'Montserrat', sans-serif;
         }
 
-        /* Main container for video grid section */
         .video-grid-section {
-          flex: 1; /* Allow section to grow */
+          flex: 1;
+          overflow-x: hidden;
           display: flex;
           flex-direction: column;
-          padding: 0; /* Increased padding for more breathing room */
-          overflow-y: auto; /* Enable scrolling if content overflows */
-          background-color: #f0f0f0; /* Explicit white background for the section */
+          padding: 0;
+          overflow-y: auto;
+          background-color: #f0f0f0;
         }
 
-        /* Container for category filter buttons */
         .category-filters {
           display: flex;
-          gap: 10px; /* More space between buttons */
-          margin-bottom: 2rem; /* More space below filters */
-          flex-wrap: wrap; /* Allow buttons to wrap to next line */
-          justify-content: center; /* Center buttons for a cleaner look */
+          gap: 10px;
+          margin-bottom: 2rem;
+          flex-wrap: wrap;
+          justify-content: center;
           background: white;
           padding: 20px;
           border-radius: 8px;
           box-shadow: 2px 0 5px rgba(0, 0, 0, 0.03);
         }
 
-        /* Styling for individual category buttons */
         .category-button {
-          background-color: var(--color-light-gray); /* Light gray for inactive state */
-          border: 1px solid var(--color-light-gray); /* Subtle border */
-          color: var(--color-medium-gray); /* Softer text color */
-          padding: 8px 16px; /* Adjusted padding */
-          border-radius: 8px; /* Consistent button radius from style.css */
+          background-color: var(--color-light-gray);
+          border: 1px solid var(--color-light-gray);
+          color: var(--color-medium-gray);
+          padding: 8px 16px;
+          border-radius: 8px;
           font-size: 0.9em;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.3s ease; /* Smooth transitions for hover effects */
+          transition: all 0.3s ease;
         }
 
-        /* Hover effect for category buttons */
         .category-button:hover {
-          background-color: var(--color-accent); /* Accent background on hover */
-          color: var(--color-white); /* White text on hover */
-          border-color: var(--color-accent); /* Accent border on hover */
-          transform: translateY(-2px); /* Subtle lift effect */
-          box-shadow: 0 4px 12px rgba(106, 142, 251, 0.2); /* Accent shadow on hover */
+          background-color: var(--color-accent);
+          color: var(--color-white);
+          border-color: var(--color-accent);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(106, 142, 251, 0.2);
         }
 
-        /* Active state for category buttons */
         .category-button.active {
           background-color: var(--color-accent);
           color: var(--color-white);
           border-color: var(--color-accent);
-          box-shadow: 0 2px 8px rgba(106, 142, 251, 0.2); /* Subtle shadow for active state */
+          box-shadow: 0 2px 8px rgba(106, 142, 251, 0.2);
         }
 
-        /* Scroll buttons for categories (if implemented) */
         .category-scroll-button {
           background: none;
           border: none;
           color: var(--color-medium-gray);
           cursor: pointer;
-          font-size: 1.5em; /* Larger icon */
+          font-size: 1.5em;
           padding: 5px;
           border-radius: 50%;
           transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Hover effect for scroll buttons */
         .category-scroll-button:hover {
           background-color: var(--color-light-gray);
           color: var(--color-dark-gray);
         }
 
-        /* Meta information text (e.g., video count message) */
         .video-meta {
           font-size: 1.1em;
           color: var(--color-medium-gray);
@@ -318,64 +301,57 @@ export function VideoGridSection({
           margin-top: 2rem;
         }
 
-        /* Specific style for error messages in video meta */
         .video-meta.video-error {
           color: #ef4444; /* Keep error red */
         }
 
-        /* Styling for main category headings (e.g., "Trending Videos") */
         .category-heading {
-          font-size: 2.2rem; /* Larger and bolder */
+          font-size: 2.2rem;
           font-weight: 700;
           color: var(--color-dark-gray);
-          margin-bottom: 2rem; /* More space below the heading */
+          margin-bottom: 2rem;
           position: relative;
-          display: inline-block; /* Allows the :after pseudo-element to be relative to text width */
-          font-family: 'Montserrat', sans-serif; /* Consistent heading font */
+          display: inline-block;
+          font-family: 'Montserrat', sans-serif;
         }
 
-        /* Underline effect for category heading */
         .category-heading:after {
           content: '';
           position: absolute;
           width: 100%;
-          height: 3px; /* Slightly thicker underline */
-          bottom: -8px; /* More space below heading */
+          height: 3px;
+          bottom: -8px;
           left: 0;
-          background: var(--color-accent); /* Use accent color for the underline */
+          background: var(--color-accent);
         }
 
-        /* Container for video tags */
         .video-tags {
           display: flex;
           flex-wrap: wrap;
-          gap: 5px; /* Space between tags */
-          margin-top: 10px; /* Space above tags */
+          gap: 5px;
+          margin-top: 10px;
         }
           
-        /* Wrapper for media (image/video thumbnail) within the card */
         .mediaWrapper {
           position: relative;
           width: 100%;
-          padding-top: 56.25%; /* 16:9 aspect ratio */
+          padding-top: 56.25%;
           overflow: hidden;
-          border-radius: 10px 10px 0 0; /* Match card radius for the top corners */
+          border-radius: 10px 10px 0 0;
         }
 
-        /* Styling for the actual media element (img/video) */
         .media {
           width: 100%;
           height: 100%;
-          object-fit: cover; /* Cover the area without distortion */
+          object-fit: cover;
           display: block;
         }
 
-        /* Styling for video duration overlay */
         .video-duration {
           position: absolute;
           bottom: 8px;
           right: 8px;
-          background-color: rgba(0, 0, 0, 0.7); /* Darker, semi-transparent background */
+          background-color: rgba(0, 0, 0, 0.7);
           color: var(--color-white);
           padding: 4px 8px;
           border-radius: 4px;
@@ -383,55 +359,49 @@ export function VideoGridSection({
           font-weight: 500;
         }
 
-        /* Styling for video title within the card */
         .videoTitle {
-          font-size: 1.1em; /* Adjust title size */
-          margin-bottom: 8px; /* More space below the title */
+          font-size: 1.1em;
+          margin-bottom: 8px;
         }
 
-        /* Styling for video score */
         .score {
           font-size: 0.9em;
           margin: 0px;
-          color: var(--color-medium-gray); /* Ensure consistent text color */
+          color: var(--color-medium-gray);
         }
 
-        /* Styling for video description */
         .description {
           font-size: 0.9em;
           line-height: 1.5;
           margin: 0px;
-          display: -webkit-box; /* Enable multiline truncation */
-          -webkit-line-clamp: 2; /* Limit description to 2 lines */
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-          text-overflow: ellipsis; /* Add ellipsis for truncated text */
-          color: var(--color-medium-gray); /* Ensure consistent text color */
+          text-overflow: ellipsis;
+          color: var(--color-medium-gray);
         }
 
-        /* Responsive adjustments */
-
-        /* Extra small devices (phones, 600px and down) */
         @media only screen and (max-width: 600px) {
           .video-grid {
-            grid-template-columns: 1fr; /* Single column */
+            grid-template-columns: 1fr;
             gap: 15px;
           }
 
           .category-filters {
-            flex-direction: column; /* Stack buttons vertically */
-            align-items: center; /* Center them */
+            flex-direction: column;
+            align-items: center;
             padding: 15px;
             margin-bottom: 1.5rem;
           }
 
           .category-button {
-            width: 100%; /* Full width buttons */
-            margin-bottom: 5px; /* Space between stacked buttons */
+            width: 100%;
+            margin-bottom: 5px;
           }
 
           .category-scroll-button {
-            margin-top: 10px; /* Space above scroll button if stacked */
+            margin-top: 10px;
           }
 
           .section-title {
@@ -453,10 +423,9 @@ export function VideoGridSection({
           }
         }
 
-        /* Small devices (portrait tablets and large phones, 600px to 768px) */
         @media only screen and (min-width: 601px) and (max-width: 768px) {
           .video-grid {
-            grid-template-columns: repeat(2, 1fr); /* Two columns */
+            grid-template-columns: repeat(2, 1fr);
             gap: 18px;
           }
 
@@ -472,15 +441,13 @@ export function VideoGridSection({
           }
         }
 
-        /* Medium devices (landscape tablets, 768px to 992px) */
         @media only screen and (min-width: 769px) and (max-width: 992px) {
           .video-grid {
-            grid-template-columns: repeat(2, 1fr); /* Two columns */
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
           }
         }
 
-        /* Large devices (laptops/desktops, 992px to 1200px) - Uses default 3 columns */
         @media only screen and (min-width: 993px) and (max-width: 1200px) {
           .video-grid {
             grid-template-columns: repeat(3, 1fr);
@@ -488,7 +455,6 @@ export function VideoGridSection({
           }
         }
 
-        /* Extra large devices (large laptops and desktops, 1200px and up) - Uses default 3 columns */
         @media only screen and (min-width: 1201px) {
           .video-grid {
             grid-template-columns: repeat(3, 1fr);

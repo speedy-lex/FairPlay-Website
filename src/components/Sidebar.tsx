@@ -1,9 +1,7 @@
 'use client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faHome,
   faCompass,
-  faGlobe,
   faBell,
   faHistory,
   faUserCircle,
@@ -11,7 +9,6 @@ import {
   faBookOpen,
   faGamepad
 } from '@fortawesome/free-solid-svg-icons'
-import './layoutStyle.css'
 
 type Props = {
   active: string
@@ -22,18 +19,8 @@ export const Sidebar: React.FC<Props> = ({ active }) => (
     <nav className="sidebar-nav">
       <ul>
         <li>
-          <a href="/" className={active === 'home' ? 'active' : ''}>
-            <FontAwesomeIcon icon={faHome} className="sidebarIcon" /> Home
-          </a>
-        </li>
-        <li>
-          <a href="/videos" className={active === 'videos' ? 'active' : ''}>
-            <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Feed
-          </a>
-        </li>
-        <li>
-          <a href="/explore" className={active === 'explore' ? 'active' : ''}>
-            <FontAwesomeIcon icon={faGlobe} className="sidebarIcon" /> Explore
+          <a href="/" className={active === 'videos' ? 'active' : ''}>
+            <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Explore
           </a>
         </li>
         <li>

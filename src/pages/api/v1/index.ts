@@ -7,7 +7,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   res.status(200).json({
-    message: 'OpenStream API v1',
+    message: 'FairPlay API v1',
     endpoints: ['/api/v1/videos']
   })
 }

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
 
 export default function Auth() {
@@ -19,7 +18,7 @@ export default function Auth() {
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
   const [registerUsername, setRegisterUsername] = useState('');
   const [registerPfpFile, setRegisterPfpFile] = useState<File | null>(null);
-  const [registerPfpFileName, setRegisterPfpFileName] = useState('Aucun fichier choisi');
+  const [registerPfpFileName, setRegisterPfpFileName] = useState('No file chosen');
   const [registerError, setRegisterError] = useState('');
 
   const router = useRouter();
@@ -40,7 +39,7 @@ export default function Auth() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (registerPassword !== registerConfirmPassword) {
-      setRegisterError('Les mots de passe ne correspondent pas.');
+      setRegisterError('The passwords do not match.');
       return;
     }
     const { data, error } = await supabase.auth.signUp({
@@ -55,7 +54,7 @@ export default function Auth() {
       return;
     }
 
-    // pfp upload : not implemented yet
+    // pfp upload : not implemented database-side yet
     if (registerPfpFile && data.user) {
       const fileExt = registerPfpFile.name.split('.').pop();
       const fileName = `${data.user.id}.${fileExt}`;
@@ -75,7 +74,7 @@ export default function Auth() {
   return (
     <>
       <Head>
-        <title>Login OpenStream</title>
+        <title>Login FairPlay</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
@@ -93,10 +92,10 @@ export default function Auth() {
         <div className="auth-card">
           <div className="auth-tabs">
             <div className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`} onClick={() => { setActiveTab('login'); setLoginError(''); setRegisterError(''); }} >
-              Connexion
+              Login
             </div>
             <div className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`} onClick={() => { setActiveTab('register'); setLoginError(''); setRegisterError(''); }} >
-              Inscription
+              SignUp
             </div>
           </div>
           {activeTab === 'login' && (
@@ -110,7 +109,7 @@ export default function Auth() {
                 <input type="password" placeholder="Mot de passe" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
               </div>
               {loginError && <p className="error-message">{loginError}</p>}
-              <button type="submit" className="auth-button">Se connecter</button>
+              <button type="submit" className="auth-button">Login</button>
             </form>
           )}
           {activeTab === 'register' && (
@@ -133,7 +132,7 @@ export default function Auth() {
               </div>
               <div className="form-group file-upload-group">
                 <label htmlFor="pfp-upload" className="custom-file-upload">
-                  <i className="fas fa-cloud-upload-alt"></i> Choisir une photo de profil
+                  <i className="fas fa-cloud-upload-alt"></i> Choose a profile picture
                 </label>
                 <input
                   id="pfp-upload"
@@ -153,23 +152,23 @@ export default function Auth() {
                 <span className="file-name">{registerPfpFileName}</span>
               </div>
               {registerError && <p className="error-message">{registerError}</p>}
-              <button type="submit" className="auth-button">S'inscrire</button>
+              <button type="submit" className="auth-button">SignUp</button>
             </form>
           )}
         </div>
       </main>
 
       <footer>
-        <p>&copy; 2023 OpenStream. Tous droits réservés.</p>
+        <p>&copy; 2023 FairPlay</p>
       </footer>
 
       <style jsx global>{`:root {
-            --background-color:rgb(255, 255, 255); /* Un noir plus profond */
-            --card-background:rgb(255, 255, 255); /* Un gris très foncé */
+            --background-color:rgb(255, 255, 255);
+            --card-background:rgb(255, 255, 255);
             --text-color:rgb(0, 0, 0);
-            --accent-color: #6a8efb ; /* Vert accentué */
-            --border-color: #383838; /* Bordures subtiles */
-            --subtle-text:rgb(85, 85, 85); /* Texte secondaire renforcé */
+            --accent-color: #6a8efb ;
+            --border-color: #383838;
+            --subtle-text:rgb(85, 85, 85);
             --hover-card:rgb(255, 255, 255);
             --danger-color: #dc3545;
         }

@@ -1,5 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Custom scrollbar styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* globals.css */
 :root {
     --color-white: #FFFFFF;
     --color-light-gray: #F0F0F0;
@@ -20,12 +39,25 @@ body {
     background-color: var(--color-light-gray);
     color: var(--color-dark-gray);
     line-height: 1.6;
+    margin: 0!important;
+    height: 100%;
+    background: #f0f0f0;
+    
 }
 
 .container {
-    max-width: 1400px; /* Largeur conservée pour l'ensemble */
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
+
+.container-flex {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 a {
@@ -51,7 +83,7 @@ p {
 .main-header {
     background-color: var(--color-white);
     border-bottom: 1px solid var(--color-light-gray);
-    padding: 12px 0; /* Padding légèrement réduit */
+    padding: 12px 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 0;
@@ -67,7 +99,7 @@ p {
 
 .logo {
     margin: 0;
-    font-size: 1.7em; /* Taille du logo légèrement réduite */
+    font-size: 1.7em;
     font-weight: 700;
     white-space: nowrap;
 }
@@ -75,10 +107,9 @@ p {
 .logo a {
     color: var(--color-dark-gray);
 }
-
 .sidebarIcon {
     margin-right: 12px;
-    font-size: 1.05em; /* Taille d'icône légèrement réduite */
+    font-size: 1.05em;
     color: var(--color-medium-gray);
 }
 .sidebar-nav ul li a.active .sidebarIcon {
@@ -97,8 +128,8 @@ p {
 
 .search-bar input[type="text"] {
     border: none;
-    padding: 9px 15px; /* Padding ajusté */
-    font-size: 0.95em; /* Taille de police ajustée */
+    padding: 9px 15px;
+    font-size: 0.95em;
     outline: none;
     flex-grow: 1;
     font-family: 'Montserrat', sans-serif;
@@ -108,11 +139,11 @@ p {
 .search-bar button {
     background-color: var(--color-light-gray);
     border: none;
-    padding: 9px 15px; /* Padding ajusté */
+    padding: 9px 15px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     color: var(--color-medium-gray);
-    font-size: 0.95em; /* Taille de police ajustée */
+    font-size: 0.95em;
 }
 
 .search-bar button:hover {
@@ -120,7 +151,6 @@ p {
     color: var(--color-white);
 }
 
-/* Navigation Principale (Header - toujours masquée ici) */
 .main-nav {
     display: none;
 }
@@ -129,29 +159,28 @@ p {
     background-color: var(--color-donate-pink);
     color: var(--color-white);
     border: none;
-    padding: 9px 18px; /* Padding réduit */
+    padding: 9px 18px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
     font-family: 'Montserrat', sans-serif;
     transition: background-color 0.3s ease;
     white-space: nowrap;
-    font-size: 0.9em; /* Taille de police réduite */
+    font-size: 0.9em;
 }
 
 .donate-button:hover {
     background-color: var(--color-donate-pink-dark);
 }
 
-/* Page Wrapper for Sidebar and Main Content */
 .page-wrapper {
     display: flex;
-    padding-top: 25px; /* Espace plus généreux sous le header */
+    padding-top: 25px;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 230px; /* Largeur légèrement réduite pour la sidebar */
+    width: 230px;
     flex-shrink: 0;
     background-color: var(--color-white);
     border-right: 1px solid var(--color-light-gray);
@@ -160,8 +189,8 @@ p {
     border-radius: 8px;
     align-self: flex-start;
     position: sticky;
-    top: 75px; /* Ajusté pour le padding du header */
-    height: calc(100vh - 95px); /* Hauteur calculée */
+    top: 75px;
+    height: calc(100vh - 95px);
     overflow-y: auto;
 }
 
@@ -174,16 +203,16 @@ p {
 .sidebar-nav li a {
     display: flex;
     align-items: center;
-    padding: 9px 20px; /* Padding ajusté */
+    padding: 9px 20px;
     color: #666666;
     font-weight: 500;
     transition: background-color 0.2s ease, color 0.2s ease;
-    font-size: 0.9em; /* Taille de police légèrement plus petite */
+    font-size: 0.9em;
 }
 
 .sidebar-nav li a i {
-    margin-right: 12px; /* Marge ajustée */
-    font-size: 1.05em; /* Taille d'icône légèrement plus petite */
+    margin-right: 12px;
+    font-size: 1.05em;
     color: var(--color-medium-gray);
 }
 
@@ -203,28 +232,28 @@ p {
 
 .sidebar-section {
     border-top: 1px solid var(--color-light-gray);
-    padding: 15px 0; /* Padding réduit */
-    margin-top: 15px; /* Marge réduite */
+    padding: 15px 0;
+    margin-top: 15px;
 }
 
 .sidebar-section h4 {
-    font-size: 0.85em; /* Taille de police réduite */
+    font-size: 0.85em;
     color: var(--color-medium-gray);
-    padding: 0 20px 8px; /* Padding ajusté */
+    padding: 0 20px 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .sidebar-section ul li a {
     padding-left: 20px;
-    font-size: 0.85em; /* Taille de police réduite */
+    font-size: 0.85em;
 }
 
 .sidebar-section ul li a img {
-    width: 22px; /* Taille d'image réduite */
-    height: 22px; /* Taille d'image réduite */
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    margin-right: 12px; /* Marge ajustée */
+    margin-right: 12px;
     object-fit: cover;
 }
 
@@ -232,14 +261,14 @@ p {
 /* Main Content Area */
 .main-content {
     flex-grow: 1;
-    margin-left: 30px; /* Espace plus généreux entre la sidebar et le contenu principal */
+    margin-left: 30px;
 }
 
 /* Footer */
 .main-footer {
     background-color: var(--color-dark-gray);
     color: var(--color-white);
-    padding: 20px 0; /* Padding réduit */
+    padding: 20px 0;
     text-align: center;
     margin-top: 40px;
 }
@@ -251,8 +280,8 @@ p {
 }
 
 .main-footer p {
-    margin: 0 0 10px 0; /* Marge réduite */
-    font-size: 0.8em; /* Taille de police réduite */
+    margin: 0 0 10px 0;
+    font-size: 0.8em;
     color: var(--color-text-light);
 }
 
@@ -266,12 +295,12 @@ p {
 }
 
 .footer-links li {
-    margin: 0 10px; /* Marge réduite */
+    margin: 0 10px;
 }
 
 .footer-links li a {
     color: var(--color-text-light);
-    font-size: 0.8em; /* Taille de police réduite */
+    font-size: 0.8em;
     transition: color 0.3s ease;
 }
 
@@ -279,14 +308,48 @@ p {
     color: var(--color-white);
 }
 
+/* info banner styles */
+.info-banner {
+  position: relative;
+  background: linear-gradient(148deg,rgba(158, 182, 255, 1) 0%, rgba(44, 98, 222, 1) 100%);
+  color: #ffffff;
+  font-size: 14px;
+  padding: 10px 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 9999;
+  text-align: center;
+}
+
+.info-banner-text {
+  display: block;
+  font-weight: 500;
+}
+
+.info-banner .close-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: inherit;
+}
+
+.info-banner .close-btn:hover {
+  opacity: 0.6;
+}
+
+
 @media (max-width: 1024px) and (min-width: 768px) {
-  /* --- Sidebar réduite à 60px --- */
+
   .sidebar {
     width: 60px;
     padding: 15px 0;
   }
 
-  /* --- On passe la <ul> en flex-colonne --- */
   .sidebar-nav ul {
     display: flex;
     flex-direction: column;
@@ -296,45 +359,37 @@ p {
     list-style: none;
   }
 
-  /* Chaque item fait la largeur de la sidebar */
   .sidebar-nav ul li {
     width: 100%;
   }
 
-  /* Le lien ne contient plus que l’icône, centré */
   .sidebar-nav ul li a {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     padding: 12px 0;
-    font-size: 0;           /* masque tout texte direct */
-    color: transparent;     /* par sécurité */
+    font-size: 0;
+    color: transparent;
   }
 
-  /* Icônes visibles, centrées et dimensionnées */
-  /* Si tu utilises <i class="sidebarIcon">…</i> : */
   .sidebar-nav ul li a .sidebarIcon,
-  /* Si tu utilises des <i> ou des <svg> directement : */
   .sidebar-nav ul li a i,
   .sidebar-nav ul li a svg {
     display: block;
-    font-size: 1.5rem;      /* ajuste à ta grille */
+    font-size: 1.5rem;
     margin: 0;
     color: var(--color-medium-gray);
   }
 
-  /* On cache tous les <span> de texte dans les liens */
   .sidebar-nav ul li a span {
     display: none;
   }
 
-  /* Si tu veux aussi masquer les sections secondaires */
   .sidebar-section {
     display: none;
   }
 
-  /* Décale un peu le contenu principal */
   .main-content {
     margin-left: 20px;
   }

@@ -19,7 +19,7 @@ export default function Profile() {
   }, [router])
 
   if (!user) {
-    return <p className="text-center mt-10">Chargement...</p>
+    return <p className="text-center mt-10">Loading...</p>
   }
 
   const handleLogout = async () => {
@@ -29,14 +29,14 @@ export default function Profile() {
 
   return (
     <div className="max-w-md mx-auto mt-10">
-      <h1 className="text-2xl mb-4">Mon profil</h1>
+      <h1 className="text-2xl mb-4">My Profile</h1>
       <div className="border p-4 rounded-lg">
         <p><strong>Email :</strong> {user.email}</p>
       </div>
       <button
         onClick={handleLogout}
         className="mt-6 bg-red-500 text-white py-2 rounded-lg">
-        Se déconnecter
+        Sign out
       </button>
     </div>
   )

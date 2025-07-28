@@ -63,7 +63,7 @@ export const UserMenu = () => {
             <p className="user-email">{user?.email}</p>
           </div>
           <Link href="/cgu" className="user-menu-item">CGU</Link>
-          <button onClick={handleLogout} className="user-menu-item">Se déconnecter</button>
+          <button onClick={handleLogout} className="user-menu-item">Logout</button>
         </div>
       )}
       <style jsx>{`

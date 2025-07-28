@@ -1,14 +1,14 @@
+"use client"
+import Head from 'next/head';
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getRecommendedVideos } from '@/lib/recommend';
 import { Topbar } from '@/components/Topbar';
 import { Sidebar } from '@/components/Sidebar';
-import { UploadModal } from '@/components/UploadModal';
 import { VideoGridSection } from '@/components/VideoGridSection';
 import { fetchYoutubeDuration, parseISODuration } from '@/utils/videoHelpers';
 import { parseThemes } from '@/lib/utils';
 import type { Video } from '@/types';
-import '@/app/globals.css';
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -53,7 +53,7 @@ export default function VideosPage() {
     fetchVideos();
   }, [fetchVideos]);
 
-  const handleUploadSuccess = () => {
+  const handleUploadSuccess = () => { // not used for now (the upload modal was removed for the MVP)
     fetchVideos();
   };
 
@@ -69,8 +69,13 @@ export default function VideosPage() {
 
   return (
     <>
+      <Head>
+        <title>FairPlay – Partagez et découvrez des vidéos de qualité</title>
+        <meta name="description" content="FairPlay est une plateforme libre pour partager, découvrir et soutenir des vidéos culturelles, scientifiques et créatives." />
+      </Head>
       <Topbar active="videos" onCreateClick={() => setShowUploadModal(true)} />
-      <div className="page-wrapper container">
+      <div className="container-flex">
+        <div className="page-wrapper">
         <Sidebar active="videos" />
         <main className="main-content">
           <VideoGridSection
@@ -84,10 +89,8 @@ export default function VideosPage() {
             parseThemes={parseThemes}
           />
         </main>
+        </div>
       </div>
-      {showUploadModal && (
-        <UploadModal onClose={() => setShowUploadModal(false)} onUploadSuccess={handleUploadSuccess} />
-      )}
     </>
   );
 }
