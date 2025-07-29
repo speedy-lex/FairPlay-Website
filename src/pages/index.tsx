@@ -70,8 +70,8 @@ export default function VideosPage() {
   return (
     <>
       <Head>
-        <title>FairPlay – Partagez et découvrez des vidéos de qualité</title>
-        <meta name="description" content="FairPlay est une plateforme libre pour partager, découvrir et soutenir des vidéos culturelles, scientifiques et créatives." />
+        <title>FairPlay</title>
+        <meta name="description" content="FairPlay is a free platform for sharing, discovering and supporting cultural, scientific and creative videos." />
       </Head>
       <Topbar active="videos" onCreateClick={() => setShowUploadModal(true)} />
       <div className="container-flex">

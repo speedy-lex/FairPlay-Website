@@ -1,0 +1,26 @@
+"use client"
+
+import Head from 'next/head';
+import { Topbar } from '@/components/Topbar'
+import { Sidebar } from '@/components/Sidebar'
+import { NotImplementedSection } from '@/components/notImplementedSection'
+
+export default function SubscriptionsPage() {
+  return (
+    <>
+      <Head>
+        <title>Subscriptions - FairPlay</title>
+        <meta name="description" content="FairPlay is a free platform for sharing, discovering and supporting cultural, scientific and creative videos." />
+      </Head>
+      <Topbar active="subscriptions" />
+      <div className="page-wrapper container">
+        <Sidebar active="subscriptions" />
+        <main className="main-content">
+          <div className="custom-scrollbar">
+            <NotImplementedSection />
+          </div>
+        </main>
+      </div>
+    </>
+  )
+}

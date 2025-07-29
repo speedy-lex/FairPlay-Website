@@ -7,7 +7,8 @@ import {
   faUserCircle,
   faAward,
   faBookOpen,
-  faGamepad
+  faGamepad,
+  faGlobe
 } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
@@ -24,6 +25,11 @@ export const Sidebar: React.FC<Props> = ({ active }) => (
           </a>
         </li>
         <li>
+          <a href="/offline" className={active === 'offline' ? 'active' : ''}>
+            <FontAwesomeIcon icon={faGlobe} className="sidebarIcon" /> Offline
+          </a>
+        </li>
+        <li>
           <a href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
             <FontAwesomeIcon icon={faBell} className="sidebarIcon" /> Subscriptions
           </a>
@@ -34,13 +40,13 @@ export const Sidebar: React.FC<Props> = ({ active }) => (
           </a>
         </li>
         <li>
-          <a href="/channel" className={active === 'channel' ? 'active' : ''}>
+          <a href="/mychannel" className={active === 'channel' ? 'active' : ''}>
             <FontAwesomeIcon icon={faUserCircle} className="sidebarIcon" /> My Channel
           </a>
         </li>
       </ul>
       <div className="sidebar-section">
-        <h4>Abonnements</h4>
+        <h4>Subscriptions</h4>
         <ul>
           <li>
             <a href="#">
@@ -60,7 +66,7 @@ export const Sidebar: React.FC<Props> = ({ active }) => (
         </ul>
       </div>
       <div className="sidebar-section">
-        <h4>Plus de FairPlay</h4>
+        <h4>More of FairPlay</h4>
         <ul>
           <li>
             <a href="#" className={active === 'popular' ? 'active' : ''}>
