@@ -6,11 +6,12 @@ import { supabase } from '@/lib/supabase'
 import type { Video } from '@/types'
 import { Topbar } from '@/components/Topbar'
 import { Sidebar } from '@/components/Sidebar'
+import styles from './VideoDetailPage.module.css'
 
 export default function VideoDetailPage() {
   const router = useRouter()
   const { id } = router.query
-
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const handleCreateClick = () => {
     router.push('/videos/create')
   }
@@ -79,43 +80,63 @@ export default function VideoDetailPage() {
       <div className="page-wrapper container">
         <Sidebar active="videos" />
         <main className="main-content">
-          <div className="video-detail-container custom-scrollbar">
+          <div className={styles.videoDetailContainer}>
             {loading && <p className="text-center">Loading...</p>}
-            {error && <p className="text-red-500 text-center">Error : {error}</p>}
+            {error && <p className="text-center" style={{ color: 'red' }}>Error: {error}</p>}
             {!loading && video && (
               <>
-                <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
-                <div className="mb-6">
-                  {video.type === 'youtube' && video.youtube_id ? (
-                    <iframe
-                      width="100%"
-                      height="400"
-                      src={`https://www.youtube.com/embed/${video.youtube_id}`}
-                      frameBorder="0"
-                      allowFullScreen
-                    />
-                  ) : (
-                    video.url && <video className="w-full h-96" controls src={video.url} />
-                  )}
+                {/* Player */}
+                {video.type === 'youtube' && video.youtube_id ? (
+                  <iframe
+                    className={styles.videoPlayer}
+                    src={`https://www.youtube.com/embed/${video.youtube_id}`}
+                    frameBorder="0"
+                    allowFullScreen
+                  />
+                ) : (
+                  video.url && <video className={styles.videoPlayer} controls src={video.url} />
+                )}
+
+                {/* Title */}
+                <h1 className={styles.title}>{video.title}</h1>
+
+                {/* Rating + Download/Donate */}
+                <div className={styles.metaRow}>
+                  <div className={styles.ratingSection}>
+                    <span className={styles.averageScore}>
+                      Average: {video.quality_score != null ? video.quality_score.toFixed(1) : 'N/A'} / 5
+                    </span>
+                    <span>Your score:</span>
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <button
+                        key={n}
+                        onClick={() => handleRate(n)}
+                        className={`${styles.ratingButton} ${n <= userRating ? styles.active : ''}`}
+                      >
+                        {n}⭐
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.actions}>
+                    {video.url && (
+                      <a href={video.url} download className={styles.downloadButton}>
+                        Download
+                      </a>
+                    )}
+                    <button className={styles.donateButton}>Donate</button>
+                  </div>
                 </div>
-                <p className="mb-4">{video.description}</p>
-                <div className="mb-4">
-                  <p className="font-medium">
-                    Average score : {video.quality_score != null ? video.quality_score.toFixed(1) : 'N/A'} / 5
-                  </p>
+
+                {/* Description */}
+                <div className={`${styles.descriptionContainer} ${descriptionExpanded ? styles.expanded : ''}`}>
+                  <p className={styles.description}>{video.description}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span>Your score :</span>
-                  {[1, 2, 3, 4, 5].map(n => (
-                    <button
-                      key={n}
-                      onClick={() => handleRate(n)}
-                      className={`px-3 py-1 rounded ${n <= userRating ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700'}`}
-                    >
-                      {n}⭐
-                    </button>
-                  ))}
-                </div>
+                <button
+                  className={styles.toggleDescription}
+                  onClick={() => setDescriptionExpanded(prev => !prev)}
+                >
+                  {descriptionExpanded ? 'Afficher moins' : 'Afficher plus'}
+                </button>
               </>
             )}
           </div>
