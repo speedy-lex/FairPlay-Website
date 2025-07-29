@@ -55,7 +55,7 @@ export function VideoGridSection({
                     )}
                     {video.type === 'youtube' && video.youtube_id ? (
                       <img
-                        src={`http://img.youtube.com/vi/$${video.youtube_id}/hqdefault.jpg`}
+                        src={`http://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
                         alt={video.title}
                         className="media"
                       />
@@ -63,12 +63,19 @@ export function VideoGridSection({
                       <video src={video.url} muted className="media" />
                     ) : null}
                     <span className="video-duration">
-                      {video.type === 'youtube' ? parseISODuration(video.duration ?? '') : video.duration}
+                      {video.type === 'youtube'
+                        ? parseISODuration(video.duration ?? '')
+                        : video.duration}
                     </span>
                   </div>
                   <div className="contentBlock">
                     <h2 className="videoTitle">{video.title}</h2>
-                    <p className="score">{video.quality_score !== undefined && video.quality_score !== null ? video.quality_score.toFixed(1) : 'N/A'} / 5</p>
+                    <p className="score">
+                      {video.quality_score !== undefined && video.quality_score !== null
+                        ? video.quality_score.toFixed(1)
+                        : 'N/A'}{' '}
+                      / 5
+                    </p>
                     <p className="description">{video.description}</p>
                     <div className="video-tags">
                       {parseThemes(video.themes ?? []).map((theme, index) => (

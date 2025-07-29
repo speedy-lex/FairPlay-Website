@@ -159,17 +159,17 @@ export default function Auth() {
       </main>
 
       <footer>
-        <p>&copy; 2023 FairPlay</p>
+        <p>&copy; 2025 FairPlay</p>
       </footer>
 
       <style jsx global>{`:root {
             --background-color:rgb(255, 255, 255);
             --card-background:rgb(255, 255, 255);
+            --text-input: #f9f9f9;
             --text-color:rgb(0, 0, 0);
             --accent-color: #6a8efb ;
             --border-color: #383838;
             --subtle-text:rgb(85, 85, 85);
-            --hover-card:rgb(255, 255, 255);
             --danger-color: #dc3545;
         }
 
@@ -245,17 +245,21 @@ export default function Auth() {
             align-items: center;
             padding: 2rem;
             min-height: calc(100vh - 120px);
+            background-color: var(--background-color);
+            /* background-image: url('images/loginbg.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center; */
         }
 
         .auth-card {
             background-color: var(--card-background);
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             padding: 2.5rem;
             width: 100%;
             max-width: 450px;
             text-align: center;
-            border: 1px solid var(--border-color);
         }
 
         .auth-tabs {
@@ -306,8 +310,8 @@ export default function Auth() {
         .auth-form input[type="text"] {
             width: 100%;
             padding: 1rem 1rem 1rem 45px;
-            background-color: var(--hover-card);
-            border: 1px solid var(--border-color);
+            background-color: var(--text-input);
+            border: 0px;
             border-radius: 8px;
             color: var(--text-color);
             font-size: 1rem;
@@ -349,10 +353,10 @@ export default function Auth() {
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--hover-card);
+            background-color: var(--text-input);
             color: var(--subtle-text);
             padding: 0.8rem 1.2rem;
-            border: 1px solid var(--border-color);
+            border: 0px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
@@ -362,7 +366,7 @@ export default function Auth() {
         }
 
         .custom-file-upload:hover {
-            background-color: #3a3a3a;
+            background-color: #dfdfdf;
             border-color: var(--accent-color);
             color: var(--text-color);
         }

@@ -80,8 +80,8 @@ export default function VideoDetailPage() {
         <Sidebar active="videos" />
         <main className="main-content">
           <div className="video-detail-container custom-scrollbar">
-            {loading && <p className="text-center">Chargement...</p>}
-            {error && <p className="text-red-500 text-center">Erreur : {error}</p>}
+            {loading && <p className="text-center">Loading...</p>}
+            {error && <p className="text-red-500 text-center">Error : {error}</p>}
             {!loading && video && (
               <>
                 <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
@@ -101,11 +101,11 @@ export default function VideoDetailPage() {
                 <p className="mb-4">{video.description}</p>
                 <div className="mb-4">
                   <p className="font-medium">
-                    Note moyenne : {video.quality_score != null ? video.quality_score.toFixed(1) : 'N/A'} / 5
+                    Average score : {video.quality_score != null ? video.quality_score.toFixed(1) : 'N/A'} / 5
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span>Ta note :</span>
+                  <span>Your score :</span>
                   {[1, 2, 3, 4, 5].map(n => (
                     <button
                       key={n}
