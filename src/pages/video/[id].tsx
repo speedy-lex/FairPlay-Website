@@ -123,7 +123,7 @@ export default function VideoDetailPage() {
                         Download
                       </a>
                     )}
-                    <button className={styles.donateButton}>Donate</button>
+                    <button className={styles.donateButton}>Donate To the Creator</button>
                   </div>
                 </div>
 

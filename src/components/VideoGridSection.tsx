@@ -249,11 +249,11 @@ export function VideoGridSection({
         .category-filters {
           display: flex;
           gap: 10px;
-          margin-bottom: 2rem;
+          margin-bottom: 20px;
           flex-wrap: wrap;
           justify-content: center;
           background: white;
-          padding: 20px;
+          padding: 10px;
           border-radius: 8px;
           box-shadow: 2px 0 5px rgba(0, 0, 0, 0.03);
         }
@@ -286,12 +286,16 @@ export function VideoGridSection({
         }
 
         .category-scroll-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
           background: none;
           border: none;
           color: var(--color-medium-gray);
           cursor: pointer;
           font-size: 1.5em;
-          padding: 5px;
           border-radius: 50%;
           transition: background-color 0.3s ease, color 0.3s ease;
         }
