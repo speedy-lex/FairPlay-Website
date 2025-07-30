@@ -1,9 +1,9 @@
 "use client"
 
 import Head from 'next/head';
-import { Topbar } from '@/components/Topbar'
-import { Sidebar } from '@/components/Sidebar'
-import { NotImplementedSection } from '@/components/notImplementedSection'
+import { Topbar } from '@/components/Topbar';
+import { Sidebar } from '@/components/Sidebar';
+import { NotImplementedSection } from '@/components/notImplementedSection';
 
 export default function HistoryPage() {
   return (
@@ -22,5 +22,5 @@ export default function HistoryPage() {
         </main>
       </div>
     </>
-  )
+  );
 }
