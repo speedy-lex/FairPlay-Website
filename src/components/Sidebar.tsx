@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faCompass,
@@ -20,29 +21,29 @@ export const Sidebar: React.FC<Props> = ({ active }) => (
     <nav className="sidebar-nav">
       <ul>
         <li>
-          <a href="/" className={active === 'videos' ? 'active' : ''}>
+          <Link href="/" className={active === 'videos' ? 'active' : ''}>
             <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Explore
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="/offline" className={active === 'offline' ? 'active' : ''}>
+          <Link href="/offline" className={active === 'offline' ? 'active' : ''}>
             <FontAwesomeIcon icon={faGlobe} className="sidebarIcon" /> Offline
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
+          <Link href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
             <FontAwesomeIcon icon={faBell} className="sidebarIcon" /> Subscriptions
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="/history" className={active === 'history' ? 'active' : ''}>
+          <Link href="/history" className={active === 'history' ? 'active' : ''}>
             <FontAwesomeIcon icon={faHistory} className="sidebarIcon" /> History
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="/mychannel" className={active === 'channel' ? 'active' : ''}>
+          <Link href="/mychannel" className={active === 'channel' ? 'active' : ''}>
             <FontAwesomeIcon icon={faUserCircle} className="sidebarIcon" /> My Channel
-          </a>
+          </Link>
         </li>
       </ul>
       <div className="sidebar-section">
@@ -50,17 +51,17 @@ export const Sidebar: React.FC<Props> = ({ active }) => (
         <ul>
           <li>
             <a href="#">
-              <img src="https://via.placeholder.com/24x24?text=C1" alt="Cha\u00eene 1" /> Channel 1
+              <img src="https://via.placeholder.com/24x24?text=C1" alt="Chaîne 1" /> Channel 1
             </a>
           </li>
           <li>
             <a href="#">
-              <img src="https://via.placeholder.com/24x24?text=C2" alt="Cha\u00eene 2" /> Channel 2
+              <img src="https://via.placeholder.com/24x24?text=C2" alt="Chaîne 2" /> Channel 2
             </a>
           </li>
           <li>
             <a href="#">
-              <img src="https://via.placeholder.com/24x24?text=C3" alt="Cha\u00eene 3" /> Channel 3
+              <img src="https://via.placeholder.com/24x24?text=C3" alt="Chaîne 3" /> Channel 3
             </a>
           </li>
         </ul>
