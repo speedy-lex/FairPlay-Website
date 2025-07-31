@@ -317,7 +317,9 @@ p {
     margin: 0;
     color: var(--color-medium-gray);
   }
-
+  .sidebarIcon {
+    margin-right: 0px;
+  }
   .sidebar-nav ul li a span {
     display: none;
   }
@@ -335,13 +337,16 @@ p {
     .main-header .container {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 15px;
+        gap: 0;
     }
-
+    .container-flex {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
     .logo {
         flex-basis: 100%;
         text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 0px;
     }
 
     .search-bar {
@@ -356,6 +361,7 @@ p {
 
     .donate-button {
         order: 2;
+        margin-bottom: 10px;
     }
 
     .page-wrapper {
@@ -372,7 +378,11 @@ p {
         margin-bottom: 20px;
         box-shadow: none;
         border-radius: 0;
-        padding-bottom: 0;
+        padding: 0;
+    }
+
+    .sidebarIcon {
+        margin-right: 0px;
     }
 
     .sidebar-nav ul {
@@ -409,7 +419,7 @@ p {
 
     .main-content {
         margin-left: 0;
-        padding: 0 10px;
+        padding: 0px;
     }
 
     .hero-section {
