@@ -147,10 +147,6 @@ p {
     font-size: 0.95em;
 }
 
-.main-nav {
-    display: none;
-}
-
 .donate-button {
     background-color: var(--color-donate-pink);
     color: var(--color-white);
@@ -163,10 +159,6 @@ p {
     transition: background-color 0.3s ease;
     white-space: nowrap;
     font-size: 0.9em;
-}
-
-.donate-button:hover {
-    background-color: var(--color-donate-pink-dark);
 }
 
 .page-wrapper {
@@ -206,12 +198,6 @@ p {
     font-size: 0.9em;
 }
 
-.sidebar-nav li a i {
-    margin-right: 12px;
-    font-size: 1.05em;
-    color: var(--color-medium-gray);
-}
-
 .sidebar-nav li a.active {
     background-color: var(--color-light-gray);
     color: var(--color-accent);
@@ -220,10 +206,6 @@ p {
 
 .sidebar-nav li a.active i {
     color: var(--color-accent);
-}
-
-.sidebar-nav li a:hover:not(.active) {
-    background-color: var(--color-light-gray);
 }
 
 .sidebar-section {
@@ -257,50 +239,6 @@ p {
 .main-content {
     flex-grow: 1;
     margin-left: 20px;
-}
-
-/* Footer */
-.main-footer {
-    background-color: var(--color-dark-gray);
-    color: var(--color-white);
-    padding: 20px 0;
-    text-align: center;
-    margin-top: 40px;
-}
-
-.main-footer .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.main-footer p {
-    margin: 0 0 10px 0;
-    font-size: 0.8em;
-    color: var(--color-text-light);
-}
-
-.footer-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.footer-links li {
-    margin: 0 10px;
-}
-
-.footer-links li a {
-    color: var(--color-text-light);
-    font-size: 0.8em;
-    transition: color 0.3s ease;
-}
-
-.footer-links li a:hover {
-    color: var(--color-white);
 }
 
 /* info banner styles */
