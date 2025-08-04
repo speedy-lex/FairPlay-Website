@@ -37,7 +37,6 @@ Open `http://localhost:3000` in your browser to see the app.
 - `src/components` – reusable React components
 - `src/lib` – shared utilities such as the Supabase client
 - `src/lib/recommend.ts` – suggestion algorithm combining user theme preferences and video ratings
-- `src/app` – Next.js root layout and global styles
 
 ## Public API
 
