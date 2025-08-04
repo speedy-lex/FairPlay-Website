@@ -14,7 +14,6 @@ export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Tous');
 
   const fetchVideos = useCallback(async () => {
@@ -26,12 +25,12 @@ export default function VideosPage() {
         vids = await getRecommendedVideos(user.id);
       } else {
         const { data } = await supabase
-          .from('videos')
-          .select('id, title, description, type, url, youtube_id, quality_score, themes')
-          .order('created_at', { ascending: false });
+            .from('videos')
+            .select('id, title, description, type, url, youtube_id, user_id, quality_score, themes, thumbnail')
+            .order('created_at', { ascending: false });
         vids = data || [];
       }
-
+      
       const vidsWithDuration = await Promise.all(
         vids.map(async v => {
           let duration = v.duration ?? '';
@@ -53,10 +52,6 @@ export default function VideosPage() {
     fetchVideos();
   }, [fetchVideos]);
 
-  const handleUploadSuccess = () => { // not used for now (the upload modal was removed for the MVP)
-    fetchVideos();
-  };
-
   const categories = React.useMemo(() => {
     const all = videos.flatMap(v => parseThemes((v as any).themes));
     const unique = Array.from(new Set(all));
@@ -73,22 +68,22 @@ export default function VideosPage() {
         <title>FairPlay</title>
         <meta name="description" content="FairPlay is a free platform for sharing, discovering and supporting cultural, scientific and creative videos." />
       </Head>
-      <Topbar active="videos" onCreateClick={() => setShowUploadModal(true)} />
+      <Topbar />
       <div className="container-flex">
         <div className="page-wrapper">
-        <Sidebar active="videos" />
-        <main className="main-content">
-          <VideoGridSection
-            loading={loading}
-            error={error}
-            categories={categories}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            filteredVideos={filteredVideos}
-            parseISODuration={parseISODuration}
-            parseThemes={parseThemes}
-          />
-        </main>
+          <Sidebar active="videos" />
+          <main className="main-content">
+            <VideoGridSection
+              loading={loading}
+              error={error}
+              categories={categories}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              filteredVideos={filteredVideos}
+              parseISODuration={parseISODuration}
+              parseThemes={parseThemes}
+            />
+          </main>
         </div>
       </div>
     </>

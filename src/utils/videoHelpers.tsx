@@ -1,27 +1,135 @@
-// utils/videoHelpers.ts
+export function normalizeThemes(input: unknown): string[] {
+  if (!input) return [];
 
-export async function fetchYoutubeDuration(youtubeId: string): Promise<string> {
+  if (Array.isArray(input)) {
+    return input.filter((t): t is string => typeof t === 'string');
+  }
+
+  if (typeof input === 'string') {
+    // Try to parse JSON
+    try {
+      const parsed = JSON.parse(input);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((t): t is string => typeof t === 'string');
+      }
+    } catch {
+      // fallback
+      return input
+        .split(',')
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+    }
+  }
+
+  return [];
+}
+
+export async function getNativeVideoDuration(
+  url: string,
+  timeoutMs = 10000
+): Promise<number> {
+  return new Promise<number>((resolve, reject) => {
+    const video = document.createElement('video');
+    let timeoutId: number | null = null;
+
+    const cleanup = () => {
+      video.removeEventListener('loadedmetadata', onLoaded);
+      video.removeEventListener('error', onError);
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+      video.src = '';
+    };
+
+    const onLoaded = () => {
+      const duration = video.duration;
+      if (duration && !isNaN(duration) && isFinite(duration)) {
+        resolve(duration);
+      } else {
+        reject(new Error('Durée invalide récupérée'));
+      }
+      cleanup();
+    };
+
+    const onError = () => {
+      reject(new Error('Échec du chargement des métadonnées vidéo'));
+      cleanup();
+    };
+
+    timeoutId = window.setTimeout(() => {
+      reject(new Error('Timeout en récupérant la durée de la vidéo'));
+      cleanup();
+    }, timeoutMs);
+
+    video.preload = 'metadata';
+    video.src = url;
+    video.addEventListener('loadedmetadata', onLoaded);
+    video.addEventListener('error', onError);
+  });
+}
+
+export async function fetchYoutubeDuration(
+  youtubeId: string
+): Promise<string> {
   const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
-  const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${youtubeId}&key=${apiKey}`;
+  if (!apiKey) {
+    console.warn('Aucune clé API YouTube définie dans NEXT_PUBLIC_YOUTUBE_API_KEY');
+    return '';
+  }
+
+  const endpoint = new URL('https://www.googleapis.com/youtube/v3/videos');
+  endpoint.searchParams.set('part', 'contentDetails');
+  endpoint.searchParams.set('id', youtubeId);
+  endpoint.searchParams.set('key', apiKey);
+
   try {
-    const response = await fetch(url);
+    const response = await fetch(endpoint.toString());
+    if (!response.ok) {
+      console.warn('YouTube API responded with non-OK status', response.status);
+      return '';
+    }
     const data = await response.json();
-    if (data.items.length === 0) return '';
-    // data.items[0].contentDetails.duration is using ISO 8601 format
-    return data.items[0].contentDetails.duration;
-  } catch {
+    if (!data.items || !Array.isArray(data.items) || data.items.length === 0) {
+      return '';
+    }
+    const duration: unknown = data.items[0]?.contentDetails?.duration;
+    if (typeof duration === 'string') return duration;
+    return '';
+  } catch (err) {
+    console.warn('Erreur lors de la récupération de la durée YouTube :', err);
     return '';
   }
 }
 
+export function secondsToISODuration(seconds: number): string {
+  const sec = Math.floor(seconds);
+  const hours = Math.floor(sec / 3600);
+  const minutes = Math.floor((sec % 3600) / 60);
+  const secs = sec % 60;
+
+  let iso = 'PT';
+  if (hours) iso += `${hours}H`;
+  if (minutes) iso += `${minutes}M`;
+  if (secs || (!hours && !minutes)) iso += `${secs}S`;
+  return iso;
+}
+
 export function parseISODuration(iso: string): string {
   if (!iso) return '';
-  const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+
+  const regex = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/;
+  const match = iso.match(regex);
   if (!match) return '';
-  const [, h, m, s] = match.map(x => parseInt(x || '0', 10));
-  const parts = [];
-  if (h) parts.push(h);
-  parts.push((m ?? 0).toString().padStart(h ? 2 : 1, '0'));
-  parts.push((s ?? 0).toString().padStart(2, '0'));
-  return parts.join(':');
+
+  const [, hRaw, mRaw, sRaw] = match;
+  const hours = parseInt(hRaw || '0', 10);
+  const minutes = parseInt(mRaw || '0', 10);
+  const seconds = parseInt(sRaw || '0', 10);
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  if (hours) {
+    return `${hours}:${pad(minutes)}:${pad(seconds)}`;
+  }
+  return `${minutes}:${pad(seconds)}`;
 }

@@ -1,477 +1,346 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, FormEvent, useEffect } from 'react';
 import Head from 'next/head';
-import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/router';
+import { supabase } from '@/lib/supabase';
 import { Topbar } from '@/components/Topbar';
 
+const TEXT = {
+  title: 'Authentification',
+  loginTab: 'Connexion',
+  registerTab: "Inscription",
+  email: 'Email',
+  password: 'Mot de passe',
+  confirmPassword: 'Confirmer le mot de passe',
+  username: 'Pseudo',
+  loginButton: 'Se connecter',
+  registerButton: "S'inscrire",
+  passwordMismatch: 'Les mots de passe ne correspondent pas.',
+  usernameRequired: 'Le pseudo est requis.',
+  confirmationSent:
+    'Un email de confirmation a été envoyé. Veuillez vérifier votre boîte de réception.',
+  authTitle: 'Auth',
+};
+
+type Tab = 'login' | 'register';
+
 export default function Auth() {
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState<Tab>('login');
 
   // login state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   // register state
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
   const [registerUsername, setRegisterUsername] = useState('');
-  const [registerPfpFile, setRegisterPfpFile] = useState<File | null>(null);
-  const [registerPfpFileName, setRegisterPfpFileName] = useState('No file chosen');
   const [registerError, setRegisterError] = useState('');
+  const [registerMessage, setRegisterMessage] = useState('');
+  const [registerLoading, setRegisterLoading] = useState(false);
 
-  const router = useRouter();
+  // Clean errors when changing tabs
+  const resetErrors = useCallback(() => {
+    setLoginError('');
+    setRegisterError('');
+    setRegisterMessage('');
+  }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: loginPassword,
-    });
-    if (error) {
-      setLoginError(error.message);
-    } else {
-      router.push('/');
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (registerPassword !== registerConfirmPassword) {
-      setRegisterError('The passwords do not match.');
-      return;
-    }
-    const { data, error } = await supabase.auth.signUp({
-      email: registerEmail,
-      password: registerPassword,
-      options: {
-        data: { username: registerUsername }
+  const handleLogin = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
+      if (loginLoading) return;
+      setLoginError('');
+      setLoginLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: loginEmail,
+          password: loginPassword,
+        });
+        if (error) {
+          setLoginError(error.message);
+        } else {
+          await router.push('/');
+        }
+      } catch (err) {
+        setLoginError('Une erreur est survenue lors de la connexion.');
+        console.error('Login error:', err);
+      } finally {
+        setLoginLoading(false);
       }
-    });
-    if (error) {
-      setRegisterError(error.message);
-      return;
-    }
+    },
+    [loginEmail, loginPassword, loginLoading, router]
+  );
 
-    // pfp upload : not implemented database-side yet
-    if (registerPfpFile && data.user) {
-      const fileExt = registerPfpFile.name.split('.').pop();
-      const fileName = `${data.user.id}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, registerPfpFile);
-      if (!uploadError) {
-        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
-        await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
+  const handleRegister = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
+      if (registerLoading) return;
+      setRegisterError('');
+      setRegisterMessage('');
+
+      if (registerPassword !== registerConfirmPassword) {
+        setRegisterError(TEXT.passwordMismatch);
+        return;
       }
-    }
+      if (!registerUsername.trim()) {
+        setRegisterError(TEXT.usernameRequired);
+        return;
+      }
 
-    router.push('/profile');
-  };
+      setRegisterLoading(true);
+      try {
+        // save pseudo
+        if (typeof window !== 'undefined' && window.localStorage) {
+          try {
+            localStorage.setItem(
+              'pending_username',
+              registerUsername.trim()
+            );
+          } catch (storageErr) {
+            console.warn(
+              'Impossible de sauvegarder le pseudo en localStorage',
+              storageErr
+            );
+          }
+        }
+
+        const redirectUrl =
+          typeof window !== 'undefined'
+            ? `${window.location.origin}/complete-profile`
+            : '/complete-profile';
+
+        const { error } = await supabase.auth.signUp({
+          email: registerEmail,
+          password: registerPassword,
+          options: {
+            emailRedirectTo: redirectUrl,
+          },
+        });
+
+        if (error) {
+          setRegisterError(error.message);
+          return;
+        }
+
+        setRegisterMessage(TEXT.confirmationSent);
+      } catch (err) {
+        setRegisterError(
+          "Une erreur est survenue lors de l'inscription."
+        );
+        console.error('Register error:', err);
+      } finally {
+        setRegisterLoading(false);
+      }
+    },
+    [
+      registerEmail,
+      registerPassword,
+      registerConfirmPassword,
+      registerUsername,
+      registerLoading,
+    ]
+  );
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        router.replace('/');
+      }
+    };
+    checkSession();
+  }, [router]);
 
   return (
-    <>
+    <div>
+      <Topbar />
       <Head>
-        <title>Login FairPlay</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        />
+        <title>{TEXT.authTitle}</title>
       </Head>
 
-      <Topbar active="home" />
-
-      <main className="auth-container">
-        <div className="auth-card">
-          <div className="auth-tabs">
-            <div className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`} onClick={() => { setActiveTab('login'); setLoginError(''); setRegisterError(''); }} >
-              Login
-            </div>
-            <div className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`} onClick={() => { setActiveTab('register'); setLoginError(''); setRegisterError(''); }} >
-              SignUp
-            </div>
-          </div>
-          {activeTab === 'login' && (
-            <form onSubmit={handleLogin} className="auth-form">
-              <div className="form-group">
-                <i className="fas fa-envelope"></i>
-                <input type="email" placeholder="Adresse email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <i className="fas fa-lock"></i>
-                <input type="password" placeholder="Mot de passe" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
-              </div>
-              {loginError && <p className="error-message">{loginError}</p>}
-              <button type="submit" className="auth-button">Login</button>
-            </form>
-          )}
-          {activeTab === 'register' && (
-            <form onSubmit={handleRegister} className="auth-form">
-              <div className="form-group">
-                <i className="fas fa-envelope"></i>
-                <input type="email" placeholder="Adresse email" value={registerEmail} onChange={(e) => setRegisterEmail(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <i className="fas fa-user"></i>
-                <input type="text" placeholder="Nom d'utilisateur" value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <i className="fas fa-lock"></i>
-                <input type="password" placeholder="Mot de passe" value={registerPassword} onChange={(e) => setRegisterPassword(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <i className="fas fa-lock"></i>
-                <input type="password" placeholder="Confirmer le mot de passe" value={registerConfirmPassword} onChange={(e) => setRegisterConfirmPassword(e.target.value)} required />
-              </div>
-              <div className="form-group file-upload-group">
-                <label htmlFor="pfp-upload" className="custom-file-upload">
-                  <i className="fas fa-cloud-upload-alt"></i> Choose a profile picture
-                </label>
-                <input
-                  id="pfp-upload"
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setRegisterPfpFile(e.target.files[0]);
-                      setRegisterPfpFileName(e.target.files[0].name);
-                    } else {
-                      setRegisterPfpFile(null);
-                      setRegisterPfpFileName('Aucun fichier choisi');
-                    }
-                  }}
-                />
-                <span className="file-name">{registerPfpFileName}</span>
-              </div>
-              {registerError && <p className="error-message">{registerError}</p>}
-              <button type="submit" className="auth-button">SignUp</button>
-            </form>
-          )}
+      <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
+        <div className="flex space-x-4 mb-4">
+          <button
+            type="button"
+            aria-pressed={activeTab === 'login'}
+            className={`focus:outline-none ${
+              activeTab === 'login' ? 'font-bold' : ''
+            }`}
+            onClick={() => {
+              setActiveTab('login');
+              resetErrors();
+            }}
+          >
+            {TEXT.loginTab}
+          </button>
+          <button
+            type="button"
+            aria-pressed={activeTab === 'register'}
+            className={`focus:outline-none ${
+              activeTab === 'register' ? 'font-bold' : ''
+            }`}
+            onClick={() => {
+              setActiveTab('register');
+              resetErrors();
+            }}
+          >
+            {TEXT.registerTab}
+          </button>
         </div>
-      </main>
 
-      <footer>
-        <p>&copy; 2025 FairPlay</p>
-      </footer>
+        {activeTab === 'login' && (
+          <form onSubmit={handleLogin} aria-label="Formulaire de connexion">
+            <div className="mb-2">
+              <label htmlFor="login-email" className="block">
+                {TEXT.email}
+              </label>
+              <input
+                id="login-email"
+                type="email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                required
+                className="w-full border p-2 rounded"
+                aria-describedby="login-error"
+              />
+            </div>
+            <div className="mb-2">
+              <label htmlFor="login-password" className="block">
+                {TEXT.password}
+              </label>
+              <input
+                id="login-password"
+                type="password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                required
+                className="w-full border p-2 rounded"
+                aria-describedby="login-error"
+              />
+            </div>
+            {loginError && (
+              <p
+                id="login-error"
+                className="text-red-500"
+                role="alert"
+                aria-live="assertive"
+              >
+                {loginError}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={loginLoading}
+              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+            >
+              {loginLoading ? '…' : TEXT.loginButton}
+            </button>
+          </form>
+        )}
 
-      <style jsx global>{`:root {
-            --background-color:rgb(255, 255, 255);
-            --card-background:rgb(255, 255, 255);
-            --text-input: #f9f9f9;
-            --text-color:rgb(0, 0, 0);
-            --accent-color: #6a8efb ;
-            --border-color: #383838;
-            --subtle-text:rgb(85, 85, 85);
-            --danger-color: #dc3545;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            background-color: var(--card-background);
-            padding: 0.8rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            text-decoration: none;
-        }
-
-        .logo img {
-            height: 40px;
-            width: auto;
-            vertical-align: middle;
-        }
-
-        nav {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        nav a {
-            color: var(--subtle-text);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 0;
-            transition: color 0.3s ease, border-bottom 0.3s ease;
-            border-bottom: 2px solid transparent;
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--text-color);
-            border-bottom: 2px solid var(--accent-color);
-        }
-
-        .auth-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-            min-height: calc(100vh - 120px);
-            background-color: var(--background-color);
-            /* background-image: url('images/loginbg.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center; */
-        }
-
-        .auth-card {
-            background-color: var(--card-background);
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
-
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 1rem 0;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--subtle-text);
-            border-bottom: 3px solid transparent;
-            transition: color 0.3s ease, border-bottom-color 0.3s ease;
-        }
-
-        .auth-tab.active {
-            color: var(--text-color);
-            border-bottom-color: var(--accent-color);
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        .form-group {
-            position: relative;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-group i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--subtle-text);
-            font-size: 1rem;
-            z-index: 1;
-        }
-
-        .auth-form input[type="email"],
-        .auth-form input[type="password"],
-        .auth-form input[type="text"] {
-            width: 100%;
-            padding: 1rem 1rem 1rem 45px;
-            background-color: var(--text-input);
-            border: 0px;
-            border-radius: 8px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .auth-form input[type="email"]:focus,
-        .auth-form input[type="password"]:focus,
-        .auth-form input[type="text"]:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(61, 220, 80, 0.2);
-            outline: none;
-        }
-
-        .auth-form input::placeholder {
-            color: var(--subtle-text);
-            opacity: 0.8;
-        }
-
-        .file-upload-group {
-            margin-top: 1rem;
-            text-align: left;
-            position: relative;
-        }
-
-        .file-upload-group label {
-            display: block;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-form input[type="file"] {
-            display: none; /* Cache l'input par défaut */
-        }
-
-        .custom-file-upload {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--text-input);
-            color: var(--subtle-text);
-            padding: 0.8rem 1.2rem;
-            border: 0px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-            gap: 10px;
-            width: 100%;
-        }
-
-        .custom-file-upload:hover {
-            background-color: #dfdfdf;
-            border-color: var(--accent-color);
-            color: var(--text-color);
-        }
-
-        .custom-file-upload i {
-            position: static;
-            transform: none;
-            color: var(--accent-color);
-        }
-        .file-name-display {
-            font-size: 0.85rem;
-            color: var(--subtle-text);
-            margin-top: 0.5rem;
-            text-align: center;
-            display: block;
-        }
-
-        .auth-form button[type="submit"] {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 1rem;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            margin-top: 1.5rem;
-            width: 100%;
-        }
-
-        .auth-form button[type="submit"]:hover {
-            background-color: #2e9f41;
-            transform: translateY(-2px);
-        }
-
-        .forgot-password {
-            font-size: 0.9rem;
-            color: var(--subtle-text);
-            text-decoration: none;
-            margin-top: -0.5rem;
-            display: block;
-            transition: color 0.2s ease;
-        }
-        .forgot-password:hover {
-            color: var(--text-color);
-        }
-
-        .hidden-form {
-            display: none;
-        }
-
-        footer {
-            background-color: var(--card-background);
-            color: var(--subtle-text);
-            text-align: center;
-            padding: 1.2rem;
-            margin-top: auto;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.85rem;
-        }
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                padding: 0.8rem 1rem;
-            }
-            nav {
-                margin-top: 0.8rem;
-                gap: 1rem;
-            }
-            .auth-container {
-                padding: 1rem;
-            }
-            .auth-card {
-                padding: 1.5rem;
-                border-radius: 8px;
-            }
-            .auth-tabs {
-                margin-bottom: 1.5rem;
-            }
-            .auth-tab {
-                font-size: 1rem;
-                padding: 0.8rem 0;
-            }
-            .auth-form input, .custom-file-upload, .auth-form button {
-                font-size: 0.95rem;
-            }
-            .auth-form input[type="email"],
-            .auth-form input[type="password"],
-            .auth-form input[type="text"] {
-                padding-left: 40px;
-            }
-            .form-group i {
-                left: 12px;
-            }
-            .custom-file-upload {
-                padding: 0.7rem 1rem;
-            }
-            .auth-form button[type="submit"] {
-                padding: 0.9rem;
-            }
-        }
-        `}
-</style>
-    </>
+        {activeTab === 'register' && (
+          <form
+            onSubmit={handleRegister}
+            aria-label="Formulaire d'inscription"
+          >
+            <div className="mb-2">
+              <label htmlFor="register-username" className="block">
+                {TEXT.username}
+              </label>
+              <input
+                id="register-username"
+                type="text"
+                value={registerUsername}
+                onChange={(e) => setRegisterUsername(e.target.value)}
+                required
+                className="w-full border p-2 rounded"
+                aria-describedby="register-error register-message"
+              />
+            </div>
+            <div className="mb-2">
+              <label htmlFor="register-email" className="block">
+                {TEXT.email}
+              </label>
+              <input
+                id="register-email"
+                type="email"
+                value={registerEmail}
+                onChange={(e) => setRegisterEmail(e.target.value)}
+                required
+                className="w-full border p-2 rounded"
+                aria-describedby="register-error register-message"
+              />
+            </div>
+            <div className="mb-2">
+              <label htmlFor="register-password" className="block">
+                {TEXT.password}
+              </label>
+              <input
+                id="register-password"
+                type="password"
+                value={registerPassword}
+                onChange={(e) => setRegisterPassword(e.target.value)}
+                required
+                className="w-full border p-2 rounded"
+                aria-describedby="register-error register-message"
+              />
+            </div>
+            <div className="mb-2">
+              <label
+                htmlFor="register-confirm-password"
+                className="block"
+              >
+                {TEXT.confirmPassword}
+              </label>
+              <input
+                id="register-confirm-password"
+                type="password"
+                value={registerConfirmPassword}
+                onChange={(e) =>
+                  setRegisterConfirmPassword(e.target.value)
+                }
+                required
+                className="w-full border p-2 rounded"
+                aria-describedby="register-error register-message"
+              />
+            </div>
+            {registerError && (
+              <p
+                id="register-error"
+                className="text-red-500"
+                role="alert"
+                aria-live="assertive"
+              >
+                {registerError}
+              </p>
+            )}
+            {registerMessage && (
+              <p
+                id="register-message"
+                className="text-green-600"
+                role="status"
+                aria-live="polite"
+              >
+                {registerMessage}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={registerLoading}
+              className="mt-3 bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+            >
+              {registerLoading ? '…' : TEXT.registerButton}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
   );
 }

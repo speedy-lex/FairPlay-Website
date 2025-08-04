@@ -1,26 +1,439 @@
-"use client"
+import { useEffect, useState, ChangeEvent, useCallback, useMemo, useRef } from 'react';
+import { useRouter } from 'next/router';
+import { useDropzone } from 'react-dropzone';
+import { supabase } from '@/lib/supabase';
+import VideoUploadModal from '@/components/mychannel/VideoUploadModal';
+import VideoList from '@/components/mychannel/VideoList';
+import { parseThemes } from '@/lib/utils';
+import { Video } from '@/types';
 
-import Head from 'next/head';
-import { Topbar } from '@/components/Topbar'
-import { Sidebar } from '@/components/Sidebar'
-import { NotImplementedSection } from '@/components/notImplementedSection'
+type ProfileData = {
+  username: string;
+  avatar_url: string | null;
+};
 
-export default function MyChannelPage() {
+type Tab = 'stats' | 'videos' | 'customization';
+
+const TEXT = {
+  loadingProfile: 'Chargement du profil...',
+  unableToLoadProfile: 'Impossible de charger le profil.',
+  myChannelStats: "Statistiques de la chaîne",
+  totalViews: 'Vues totales',
+  subscribers: 'Abonnés',
+  publishedVideos: 'Vidéos publiées',
+  manageVideos: 'Gérer vos vidéos',
+  dropzoneActive: 'Déposez la vidéo ici...',
+  dropzoneIdle: 'Glissez-déposez une vidéo ou cliquez pour en sélectionner une',
+  noVideos: 'Aucune vidéo publiée.',
+  customizeChannel: 'Personnaliser votre chaîne',
+  channelBanner: "Bannière de la chaîne",
+  edit: 'Modifier',
+  profileImage: 'Image de profil',
+  channelName: 'Nom de la chaîne',
+  channelHandle: 'Pseudo (@)',
+  saveChanges: 'Sauvegarder les modifications',
+  saving: 'Sauvegarde...',
+  logout: 'Se déconnecter',
+  tabs: {
+    stats: 'Statistiques',
+    videos: 'Vidéos',
+    customization: 'Personnalisation',
+  },
+  defaultAvatar: '/default-avatar.png',
+};
+
+export default function MyChannel() {
+  const router = useRouter();
+
+  // Profile state
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [editUsername, setEditUsername] = useState('');
+
+  const editHandle = useMemo(() => {
+    return editUsername ? `@${editUsername.replace(/\s+/g, '')}` : '';
+  }, [editUsername]);
+
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const avatarObjectUrlRef = useRef<string | null>(null); // pour nettoyer
+
+  // Videos state
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loadingVideos, setLoadingVideos] = useState(true);
+  const [existingThemes, setExistingThemes] = useState<string[]>([]);
+
+  // UI state
+  const [activeTab, setActiveTab] = useState<Tab>('stats');
+  const [showModal, setShowModal] = useState(false);
+  const [loadingSave, setLoadingSave] = useState(false);
+  const [editingVideo, setEditingVideo] = useState<Video | null>(null);
+  const [initialFile, setInitialFile] = useState<File | null>(null);
+
+  // === Utils ===
+
+  const getSessionUser = useCallback(async () => {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.user) {
+      return null;
+    }
+    return session.user;
+  }, []);
+
+  // === Fetchers ===
+
+  const fetchProfile = useCallback(async () => {
+    setLoadingProfile(true);
+    const user = await getSessionUser();
+    if (!user) {
+      router.push('/');
+      return;
+    }
+
+    const { data: profileData, error } = await supabase
+      .from('profiles')
+      .select('username, avatar_url')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Erreur récupération profil :', error);
+      setLoadingProfile(false);
+      return;
+    }
+
+    setProfile({
+      username: profileData.username,
+      avatar_url: profileData.avatar_url,
+    });
+    setEditUsername(profileData.username || '');
+    setAvatarPreview(profileData.avatar_url);
+    setLoadingProfile(false);
+  }, [getSessionUser, router]);
+
+  const fetchExistingThemes = useCallback(async () => {
+    const { data } = await supabase.from('videos').select('themes');
+    if (data) {
+      const all = data.flatMap((v: { themes: string | null }) => parseThemes(v.themes));
+      const unique = Array.from(new Set(all));
+      setExistingThemes(unique);
+    }
+  }, []);
+
+  const fetchVideos = useCallback(async () => {
+    setLoadingVideos(true);
+    const user = await getSessionUser();
+    if (!user) {
+      setLoadingVideos(false);
+      return;
+    }
+
+    const { data: vids, error } = await supabase
+      .from('videos')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erreur récupération vidéos :', error);
+      setLoadingVideos(false);
+      return;
+    }
+
+    setVideos(vids || []);
+    setLoadingVideos(false);
+  }, [getSessionUser]);
+
+  useEffect(() => {
+    fetchProfile();
+    fetchVideos();
+    fetchExistingThemes();
+  }, [fetchProfile, fetchVideos, fetchExistingThemes]);
+
+  // === Dropzone ===
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (!acceptedFiles[0]) return;
+    setInitialFile(acceptedFiles[0]);
+    setEditingVideo(null);
+    setShowModal(true);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'video/*': [] },
+    multiple: false,
+  });
+
+  const openEditVideoModal = useCallback((video: Video) => {
+    setEditingVideo(video);
+    setInitialFile(null);
+    setShowModal(true);
+  }, []);
+
+  // === Handlers ===
+
+  const handleLogout = useCallback(async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  }, [router]);
+
+  const handleUsernameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setEditUsername(e.target.value);
+  }, []);
+
+  const handleSaveProfile = useCallback(async () => {
+    if (!profile) return;
+    setLoadingSave(true);
+    const user = await getSessionUser();
+    if (!user) {
+      setLoadingSave(false);
+      return;
+    }
+
+    const updates = { username: editUsername };
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id);
+
+    if (updateError) {
+      console.error('Erreur mise à jour profil :', updateError);
+      // TODO: afficher un message utilisateur
+    } else {
+      await fetchProfile();
+    }
+
+    setLoadingSave(false);
+  }, [editUsername, fetchProfile, getSessionUser, profile]);
+
+  const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Nettoyage de l'ancien objectURL
+    if (avatarObjectUrlRef.current) {
+      URL.revokeObjectURL(avatarObjectUrlRef.current);
+    }
+
+    const url = URL.createObjectURL(file);
+    avatarObjectUrlRef.current = url;
+    setAvatarPreview(url);
+    // TODO: upload réel vers Supabase
+  }, []);
+
+  // nettoyage au démontage
+  useEffect(() => {
+    return () => {
+      if (avatarObjectUrlRef.current) {
+        URL.revokeObjectURL(avatarObjectUrlRef.current);
+      }
+    };
+  }, []);
+
+  const handleDeleteVideo = useCallback(
+    async (video: Video) => {
+      if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette vidéo ?')) return;
+
+      try {
+        let pathToRemove: string | null = null;
+        const storagePath = (video as any).storage_path as string | undefined;
+
+        if (storagePath) {
+          pathToRemove = storagePath;
+        } else if (video.url) {
+          const match = video.url.match(/\/videos\/(.+)$/);
+          if (match?.[1]) {
+            pathToRemove = decodeURIComponent(match[1]);
+          }
+        }
+
+        if (pathToRemove) {
+          const { error: storageError } = await supabase.storage
+            .from('videos')
+            .remove([pathToRemove]);
+
+          if (storageError) {
+            console.warn('Erreur suppression fichier storage :', storageError);
+          }
+        } else {
+          console.warn('Impossible de déterminer le chemin du fichier à supprimer.');
+        }
+
+        const { error: dbError } = await supabase
+          .from('videos')
+          .delete()
+          .eq('id', video.id);
+
+        if (dbError) {
+          console.error('Erreur suppression en base :', dbError);
+          return;
+        }
+
+        await fetchVideos();
+      } catch (err) {
+        console.error('Erreur lors de la suppression :', err);
+      }
+    },
+    [fetchVideos]
+  );
+
+  // === Render early exits ===
+
+  if (loadingProfile) {
+    return <div className="text-center mt-10">{TEXT.loadingProfile}</div>;
+  }
+  if (!profile) {
+    return <div className="text-center mt-10">{TEXT.unableToLoadProfile}</div>;
+  }
+
   return (
-    <>
-      <Head>
-        <title>My Channel - FairPlay</title>
-        <meta name="description" content="FairPlay is a free platform for sharing, discovering and supporting cultural, scientific and creative videos." />
-      </Head>
-      <Topbar active="channel" />
-      <div className="page-wrapper container">
-        <Sidebar active="channel" />
-        <main className="main-content">
-          <div className="custom-scrollbar">
-            <NotImplementedSection />
+    <div className="container">
+      <div className="main-content">
+        <div className="channel-card">
+          <div className="channel-header">
+            <img
+              src={avatarPreview || profile.avatar_url || TEXT.defaultAvatar}
+              alt={`${profile.username} avatar`}
+              width={140}
+              height={140}
+              style={{ borderRadius: '50%' }}
+            />
+            <div>
+              <h2>{profile.username}</h2>
+              <p>{editHandle}</p>
+            </div>
           </div>
-        </main>
+
+          <div className="tabs-nav">
+            <button
+              type="button"
+              className={activeTab === 'stats' ? 'active' : ''}
+              onClick={() => setActiveTab('stats')}
+            >
+              {TEXT.tabs.stats}
+            </button>
+            <button
+              type="button"
+              className={activeTab === 'videos' ? 'active' : ''}
+              onClick={() => setActiveTab('videos')}
+            >
+              {TEXT.tabs.videos}
+            </button>
+            <button
+              type="button"
+              className={activeTab === 'customization' ? 'active' : ''}
+              onClick={() => setActiveTab('customization')}
+            >
+              {TEXT.tabs.customization}
+            </button>
+          </div>
+
+          {activeTab === 'videos' && (
+            <section>
+              <h3>{TEXT.manageVideos}</h3>
+              <div {...getRootProps()} className="dropzone">
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <p>{TEXT.dropzoneActive}</p>
+                ) : (
+                  <p>{TEXT.dropzoneIdle}</p>
+                )}
+              </div>
+
+              {loadingVideos ? (
+                <p>{TEXT.loadingProfile.replace('profil', 'vidéos')}...</p>
+              ) : videos.length === 0 ? (
+                <p>{TEXT.noVideos}</p>
+              ) : (
+                <VideoList videos={videos} onEdit={openEditVideoModal} onDelete={handleDeleteVideo} />
+              )}
+            </section>
+          )}
+
+          {activeTab === 'customization' && (
+            <section>
+              <h3>{TEXT.customizeChannel}</h3>
+              <div className="form-group">
+                <label>{TEXT.channelBanner}</label>
+                <div className="banner-preview">
+                  <img
+                    src="https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière"
+                    alt="Bannière de la chaîne"
+                  />
+                  <button type="button">{TEXT.edit}</button>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="avatar-upload">{TEXT.profileImage}</label>
+                <input id="avatar-upload" type="file" onChange={handleAvatarChange} />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="channel-name">{TEXT.channelName}</label>
+                <input id="channel-name" value={editUsername} onChange={handleUsernameChange} />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="channel-handle">{TEXT.channelHandle}</label>
+                <input id="channel-handle" value={editHandle} readOnly />
+              </div>
+
+              <div>
+                <button onClick={handleSaveProfile} disabled={loadingSave}>
+                  {loadingSave ? TEXT.saving : TEXT.saveChanges}
+                </button>
+              </div>
+            </section>
+          )}
+
+          {activeTab === 'stats' && (
+            <section>
+              <h3>{TEXT.myChannelStats}</h3>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <p>{TEXT.totalViews}</p>
+                  <p>--</p>
+                </div>
+                <div className="stat-card">
+                  <p>{TEXT.subscribers}</p>
+                  <p>--</p>
+                </div>
+                <div className="stat-card">
+                  <p>{TEXT.publishedVideos}</p>
+                  <p>{videos.length}</p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          <div className="actions">
+            <button type="button" onClick={handleLogout}>
+              {TEXT.logout}
+            </button>
+          </div>
+        </div>
       </div>
-    </>
-  )
+
+      {showModal && (
+        <VideoUploadModal
+          open={showModal}
+          onClose={() => {
+            setShowModal(false);
+            setInitialFile(null);
+            setEditingVideo(null);
+          }}
+          onSuccess={fetchVideos}
+          existingThemes={existingThemes}
+          setExistingThemes={setExistingThemes}
+          initialFile={initialFile}
+          editingVideo={editingVideo}
+        />
+      )}
+    </div>
+  );
 }

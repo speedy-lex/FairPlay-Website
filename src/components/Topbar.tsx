@@ -1,13 +1,8 @@
 'use client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
-type Props = {
-  active: string
-  onCreateClick?: () => void
-}
-
-export const Topbar: React.FC<Props> = ({ active, onCreateClick }) => (
+export const Topbar: React.FC = () => (
   <header className="main-header">
     <div className="container">
       <h1 className="logo">
