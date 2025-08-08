@@ -6,6 +6,8 @@ import VideoUploadModal from '@/components/mychannel/VideoUploadModal';
 import VideoList from '@/components/mychannel/VideoList';
 import { parseThemes } from '@/lib/utils';
 import { Video } from '@/types';
+import { ToastProvider, useToast } from '@/components/props/Toast';
+import styles from '../components/mychannel/MyChannel.module.css';
 
 type ProfileData = {
   username: string;
@@ -42,20 +44,19 @@ const TEXT = {
   defaultAvatar: '/default-avatar.png',
 };
 
-export default function MyChannel() {
+function MyChannelInner() {
   const router = useRouter();
+  const { error: toastError, success: toastSuccess, info: toastInfo } = useToast();
 
   // Profile state
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [editUsername, setEditUsername] = useState('');
 
-  const editHandle = useMemo(() => {
-    return editUsername ? `@${editUsername.replace(/\s+/g, '')}` : '';
-  }, [editUsername]);
+  const editHandle = useMemo(() => (editUsername ? `@${editUsername.replace(/\s+/g, '')}` : ''), [editUsername]);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const avatarObjectUrlRef = useRef<string | null>(null); // pour nettoyer
+  const avatarObjectUrlRef = useRef<string | null>(null);
 
   // Videos state
   const [videos, setVideos] = useState<Video[]>([]);
@@ -70,25 +71,21 @@ export default function MyChannel() {
   const [initialFile, setInitialFile] = useState<File | null>(null);
 
   // === Utils ===
-
   const getSessionUser = useCallback(async () => {
     const {
       data: { session },
       error: sessionError,
     } = await supabase.auth.getSession();
-
-    if (sessionError || !session?.user) {
-      return null;
-    }
+    if (sessionError || !session?.user) return null;
     return session.user;
   }, []);
 
   // === Fetchers ===
-
   const fetchProfile = useCallback(async () => {
     setLoadingProfile(true);
     const user = await getSessionUser();
     if (!user) {
+      toastError('Session expirée. Veuillez vous reconnecter.');
       router.push('/');
       return;
     }
@@ -100,28 +97,35 @@ export default function MyChannel() {
       .single();
 
     if (error) {
-      console.error('Erreur récupération profil :', error);
+      toastError('Impossible de charger le profil.');
       setLoadingProfile(false);
       return;
     }
 
-    setProfile({
-      username: profileData.username,
-      avatar_url: profileData.avatar_url,
-    });
+    setProfile({ username: profileData.username, avatar_url: profileData.avatar_url });
     setEditUsername(profileData.username || '');
     setAvatarPreview(profileData.avatar_url);
     setLoadingProfile(false);
-  }, [getSessionUser, router]);
+  }, [getSessionUser, router, toastError]);
 
   const fetchExistingThemes = useCallback(async () => {
-    const { data } = await supabase.from('videos').select('themes');
+    const { data, error } = await supabase.from('videos').select('themes');
+    if (error) {
+      toastInfo('Les suggestions de thèmes ne sont pas disponibles pour le moment.');
+      return;
+    }
     if (data) {
-      const all = data.flatMap((v: { themes: string | null }) => parseThemes(v.themes));
+      const all = data.flatMap((v: { themes: unknown }) => {
+        try {
+          return parseThemes(v.themes as any);
+        } catch {
+          return [] as string[];
+        }
+      });
       const unique = Array.from(new Set(all));
       setExistingThemes(unique);
     }
-  }, []);
+  }, [toastInfo]);
 
   const fetchVideos = useCallback(async () => {
     setLoadingVideos(true);
@@ -138,14 +142,14 @@ export default function MyChannel() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Erreur récupération vidéos :', error);
+      toastError('Erreur lors du chargement des vidéos.');
       setLoadingVideos(false);
       return;
     }
 
     setVideos(vids || []);
     setLoadingVideos(false);
-  }, [getSessionUser]);
+  }, [getSessionUser, toastError]);
 
   useEffect(() => {
     fetchProfile();
@@ -154,7 +158,6 @@ export default function MyChannel() {
   }, [fetchProfile, fetchVideos, fetchExistingThemes]);
 
   // === Dropzone ===
-
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (!acceptedFiles[0]) return;
     setInitialFile(acceptedFiles[0]);
@@ -175,7 +178,6 @@ export default function MyChannel() {
   }, []);
 
   // === Handlers ===
-
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
     router.push('/');
@@ -195,42 +197,32 @@ export default function MyChannel() {
     }
 
     const updates = { username: editUsername };
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id);
+    const { error: updateError } = await supabase.from('profiles').update(updates).eq('id', user.id);
 
     if (updateError) {
-      console.error('Erreur mise à jour profil :', updateError);
-      // TODO: afficher un message utilisateur
+      toastError('Échec de la sauvegarde du profil.');
     } else {
+      toastSuccess('Profil enregistré.');
       await fetchProfile();
     }
 
     setLoadingSave(false);
-  }, [editUsername, fetchProfile, getSessionUser, profile]);
+  }, [editUsername, fetchProfile, getSessionUser, profile, toastError, toastSuccess]);
 
   const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Nettoyage de l'ancien objectURL
-    if (avatarObjectUrlRef.current) {
-      URL.revokeObjectURL(avatarObjectUrlRef.current);
-    }
+    if (avatarObjectUrlRef.current) URL.revokeObjectURL(avatarObjectUrlRef.current);
 
     const url = URL.createObjectURL(file);
     avatarObjectUrlRef.current = url;
     setAvatarPreview(url);
-    // TODO: upload réel vers Supabase
   }, []);
 
-  // nettoyage au démontage
   useEffect(() => {
     return () => {
-      if (avatarObjectUrlRef.current) {
-        URL.revokeObjectURL(avatarObjectUrlRef.current);
-      }
+      if (avatarObjectUrlRef.current) URL.revokeObjectURL(avatarObjectUrlRef.current);
     };
   }, []);
 
@@ -246,55 +238,44 @@ export default function MyChannel() {
           pathToRemove = storagePath;
         } else if (video.url) {
           const match = video.url.match(/\/videos\/(.+)$/);
-          if (match?.[1]) {
-            pathToRemove = decodeURIComponent(match[1]);
-          }
+          if (match?.[1]) pathToRemove = decodeURIComponent(match[1]);
         }
 
         if (pathToRemove) {
-          const { error: storageError } = await supabase.storage
-            .from('videos')
-            .remove([pathToRemove]);
-
+          const { error: storageError } = await supabase.storage.from('videos').remove([pathToRemove]);
           if (storageError) {
             console.warn('Erreur suppression fichier storage :', storageError);
+            toastInfo("Le fichier n'a pas été trouvé dans le storage, suppression des métadonnées…");
           }
         } else {
-          console.warn('Impossible de déterminer le chemin du fichier à supprimer.');
+          toastInfo("Chemin du fichier introuvable, suppression des métadonnées uniquement.");
         }
 
-        const { error: dbError } = await supabase
-          .from('videos')
-          .delete()
-          .eq('id', video.id);
-
+        const { error: dbError } = await supabase.from('videos').delete().eq('id', video.id);
         if (dbError) {
-          console.error('Erreur suppression en base :', dbError);
+          toastError('Suppression en base échouée.');
           return;
         }
 
         await fetchVideos();
+        toastSuccess('Vidéo supprimée.');
       } catch (err) {
         console.error('Erreur lors de la suppression :', err);
+        toastError('Erreur lors de la suppression.');
       }
     },
-    [fetchVideos]
+    [fetchVideos, toastError, toastSuccess, toastInfo]
   );
 
   // === Render early exits ===
-
-  if (loadingProfile) {
-    return <div className="text-center mt-10">{TEXT.loadingProfile}</div>;
-  }
-  if (!profile) {
-    return <div className="text-center mt-10">{TEXT.unableToLoadProfile}</div>;
-  }
+  if (loadingProfile) return <div className={`${styles.textCenter} ${styles.mt10}`}>{TEXT.loadingProfile}</div>;
+  if (!profile) return <div className={`${styles.textCenter} ${styles.mt10}`}>{TEXT.unableToLoadProfile}</div>;
 
   return (
-    <div className="container">
-      <div className="main-content">
-        <div className="channel-card">
-          <div className="channel-header">
+    <div className={styles.myChannelContainer}>
+      <div className={styles.mainContent}>
+        <div className={styles.channelCard}>
+          <div className={styles.channelHeader}>
             <img
               src={avatarPreview || profile.avatar_url || TEXT.defaultAvatar}
               alt={`${profile.username} avatar`}
@@ -308,24 +289,24 @@ export default function MyChannel() {
             </div>
           </div>
 
-          <div className="tabs-nav">
+          <div className={styles.tabsNav}>
             <button
               type="button"
-              className={activeTab === 'stats' ? 'active' : ''}
+              className={activeTab === 'stats' ? styles.active : undefined}
               onClick={() => setActiveTab('stats')}
             >
               {TEXT.tabs.stats}
             </button>
             <button
               type="button"
-              className={activeTab === 'videos' ? 'active' : ''}
+              className={activeTab === 'videos' ? styles.active : undefined}
               onClick={() => setActiveTab('videos')}
             >
               {TEXT.tabs.videos}
             </button>
             <button
               type="button"
-              className={activeTab === 'customization' ? 'active' : ''}
+              className={activeTab === 'customization' ? styles.active : undefined}
               onClick={() => setActiveTab('customization')}
             >
               {TEXT.tabs.customization}
@@ -335,13 +316,9 @@ export default function MyChannel() {
           {activeTab === 'videos' && (
             <section>
               <h3>{TEXT.manageVideos}</h3>
-              <div {...getRootProps()} className="dropzone">
+              <div {...getRootProps({ className: styles.dropzone })}>
                 <input {...getInputProps()} />
-                {isDragActive ? (
-                  <p>{TEXT.dropzoneActive}</p>
-                ) : (
-                  <p>{TEXT.dropzoneIdle}</p>
-                )}
+                {isDragActive ? <p>{TEXT.dropzoneActive}</p> : <p>{TEXT.dropzoneIdle}</p>}
               </div>
 
               {loadingVideos ? (
@@ -357,33 +334,30 @@ export default function MyChannel() {
           {activeTab === 'customization' && (
             <section>
               <h3>{TEXT.customizeChannel}</h3>
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>{TEXT.channelBanner}</label>
-                <div className="banner-preview">
-                  <img
-                    src="https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière"
-                    alt="Bannière de la chaîne"
-                  />
+                <div className={styles.bannerPreview}>
+                  <img src="https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière" alt="Bannière de la chaîne" />
                   <button type="button">{TEXT.edit}</button>
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label htmlFor="avatar-upload">{TEXT.profileImage}</label>
                 <input id="avatar-upload" type="file" onChange={handleAvatarChange} />
               </div>
 
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label htmlFor="channel-name">{TEXT.channelName}</label>
                 <input id="channel-name" value={editUsername} onChange={handleUsernameChange} />
               </div>
 
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label htmlFor="channel-handle">{TEXT.channelHandle}</label>
                 <input id="channel-handle" value={editHandle} readOnly />
               </div>
 
-              <div>
+              <div className={styles.actions}>
                 <button onClick={handleSaveProfile} disabled={loadingSave}>
                   {loadingSave ? TEXT.saving : TEXT.saveChanges}
                 </button>
@@ -394,16 +368,16 @@ export default function MyChannel() {
           {activeTab === 'stats' && (
             <section>
               <h3>{TEXT.myChannelStats}</h3>
-              <div className="stats-grid">
-                <div className="stat-card">
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
                   <p>{TEXT.totalViews}</p>
                   <p>--</p>
                 </div>
-                <div className="stat-card">
+                <div className={styles.statCard}>
                   <p>{TEXT.subscribers}</p>
                   <p>--</p>
                 </div>
-                <div className="stat-card">
+                <div className={styles.statCard}>
                   <p>{TEXT.publishedVideos}</p>
                   <p>{videos.length}</p>
                 </div>
@@ -411,10 +385,8 @@ export default function MyChannel() {
             </section>
           )}
 
-          <div className="actions">
-            <button type="button" onClick={handleLogout}>
-              {TEXT.logout}
-            </button>
+          <div className={styles.actions}>
+            <button type="button" onClick={handleLogout}>{TEXT.logout}</button>
           </div>
         </div>
       </div>
@@ -435,5 +407,13 @@ export default function MyChannel() {
         />
       )}
     </div>
+  );
+}
+
+export default function MyChannelPage() {
+  return (
+    <ToastProvider>
+      <MyChannelInner />
+    </ToastProvider>
   );
 }

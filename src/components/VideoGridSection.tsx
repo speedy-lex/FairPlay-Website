@@ -18,8 +18,8 @@ interface VideoGridSectionProps {
 const TEXT = {
   loading: 'Chargement…',
   errorPrefix: 'Erreur :',
-  scoreLabel: 'Score:',
-  byPrefix: 'par',
+  scoreLabel: '', // keep it there in case...
+  byPrefix: '',
   authorPending: 'Auteur…',
   authorUnknown: 'Auteur inconnu',
   noVideosDuration: '—',
@@ -49,9 +49,6 @@ function normalizeDuration(raw: unknown): string | number | null {
   return null;
 }
 
-/**
- * Fallback permissif pour parser une durée ISO (ex: PT1H2M3S). Retourne "—" si invalide.
- */
 function parseISODurationFallback(iso: string): string {
   if (typeof iso !== 'string' || !iso.startsWith('P')) return TEXT.noVideosDuration;
   const regex = /P(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?/;
@@ -143,8 +140,6 @@ export function VideoGridSection({
     };
 
     fetchMissingAuthors();
-    // Intentionnel : dépendance uniquement sur filteredVideos pour refetch quand la liste change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredVideos]);
 
   return (
@@ -181,7 +176,6 @@ export function VideoGridSection({
             const authorId = (video as any).user_id as string | undefined;
             const authorusername = authorId ? authorMap[authorId] : undefined;
 
-            // Durée
             const originalRaw = video.duration;
             const normalized = normalizeDuration(originalRaw);
             let durationDisplay = TEXT.noVideosDuration;

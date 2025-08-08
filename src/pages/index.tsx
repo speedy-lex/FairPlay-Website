@@ -1,4 +1,5 @@
 "use client"
+
 import Head from 'next/head';
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -26,7 +27,7 @@ export default function VideosPage() {
       } else {
         const { data } = await supabase
             .from('videos')
-            .select('id, title, description, type, url, youtube_id, user_id, quality_score, themes, thumbnail')
+            .select('id, title, description, type, url, youtube_id, user_id, quality_score, themes, duration, thumbnail')
             .order('created_at', { ascending: false });
         vids = data || [];
       }

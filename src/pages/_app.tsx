@@ -1,5 +1,5 @@
-import '@fortawesome/fontawesome-svg-core/styles.css'
 import "@/styles/globals.css";
+import '@fortawesome/fontawesome-svg-core/styles.css'
 import type { AppProps } from "next/app";
 import { DevBanner } from '@/components/props/infoBanner';
 

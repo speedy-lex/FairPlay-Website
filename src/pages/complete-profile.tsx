@@ -36,7 +36,6 @@ export default function CompleteProfile() {
   const [status, setStatus] = useState(TEXT.completingSession);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Récupération de la session et préremplissage du pseudo
   useEffect(() => {
     const applySession = async () => {
       try {
@@ -70,7 +69,6 @@ export default function CompleteProfile() {
           setUser(data.session.user);
           setStatus(TEXT.sessionRetrieved);
         } else {
-          // Pas d'erreur mais pas d'utilisateur : tente session en cache
           const {
             data: currentSession,
             error: currErr,
@@ -143,7 +141,7 @@ export default function CompleteProfile() {
           avatar_url = (publicUrlData as any).publicUrl || '';
         }
 
-        // Upsert du profil
+        // Upsert profile
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert(
@@ -166,8 +164,7 @@ export default function CompleteProfile() {
           setIsSubmitting(false);
           return;
         }
-
-        // Met à jour les metadata utilisateur (optionnel)
+        
         await supabase.auth.updateUser({
           data: { username: trimmedUsername, avatar_url },
         });

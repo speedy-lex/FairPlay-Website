@@ -9,12 +9,11 @@ import {
   memo,
 } from 'react';
 import { supabase } from '@/lib/supabase';
-import {
-  getNativeVideoDuration,
-  secondsToISODuration,
-} from '@/utils/videoHelpers';
+import { getNativeVideoDuration, secondsToISODuration } from '@/utils/videoHelpers';
 import { Video } from '@/types';
 import { XIcon } from '@/components/props/icons';
+import { useToast } from '@/components/props/Toast';
+import styles from './MyChannel.module.css';
 
 interface VideoUploadModalProps {
   open: boolean;
@@ -49,15 +48,11 @@ const TEXT = {
 
 function normalizeThemes(input: unknown): string[] {
   if (!input) return [];
-  if (Array.isArray(input)) {
-    return input.filter((t): t is string => typeof t === 'string');
-  }
+  if (Array.isArray(input)) return input.filter((t): t is string => typeof t === 'string');
   if (typeof input === 'string') {
     try {
       const parsed = JSON.parse(input);
-      if (Array.isArray(parsed)) {
-        return parsed.filter((t): t is string => typeof t === 'string');
-      }
+      return Array.isArray(parsed) ? parsed.filter((t): t is string => typeof t === 'string') : [];
     } catch {
       return input
         .split(',')
@@ -71,14 +66,11 @@ function normalizeThemes(input: unknown): string[] {
 const THUMBNAIL_BUCKET = 'thumbnails';
 const VIDEO_BUCKET = 'videos';
 
-async function uploadFileToBucket(
-  bucket: string,
-  file: File
-): Promise<{ publicUrl: string } | null> {
+type UploadResult = { publicUrl: string; path: string } | null;
+
+async function uploadFileToBucket(bucket: string, file: File): Promise<UploadResult> {
   const fileName = `${Date.now()}_${file.name}`;
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from(bucket)
-    .upload(fileName, file);
+  const { data: uploadData, error: uploadError } = await supabase.storage.from(bucket).upload(fileName, file);
   if (uploadError || !uploadData?.path) {
     console.warn(`Erreur upload dans ${bucket}:`, uploadError);
     return null;
@@ -86,7 +78,7 @@ async function uploadFileToBucket(
   const {
     data: { publicUrl },
   } = supabase.storage.from(bucket).getPublicUrl(uploadData.path);
-  return { publicUrl };
+  return { publicUrl, path: uploadData.path };
 }
 
 const VideoUploadModal: FC<VideoUploadModalProps> = ({
@@ -98,6 +90,8 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
   initialFile,
   editingVideo,
 }) => {
+  const { error: toastError, success: toastSuccess, info: toastInfo } = useToast();
+
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
@@ -109,16 +103,14 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
-  // Cleaning the URL object
+  // Cleanup preview URL on unmount/change
   useEffect(() => {
     return () => {
-      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
-        URL.revokeObjectURL(thumbnailPreview);
-      }
+      if (thumbnailPreview?.startsWith('blob:')) URL.revokeObjectURL(thumbnailPreview);
     };
   }, [thumbnailPreview]);
 
-  // Initialize on opening or editing
+  // Initialize form when opening or switching mode
   useEffect(() => {
     if (!open) return;
 
@@ -127,7 +119,7 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
       setDescription(editingVideo.description || '');
       setTags(normalizeThemes((editingVideo as any).themes));
       setFile(null);
-      const existingThumb = (editingVideo as any).thumbnail;
+      const existingThumb = (editingVideo as any).thumbnail as string | undefined;
       setThumbnailPreview(existingThumb || null);
       setThumbnailFile(null);
     } else {
@@ -146,14 +138,10 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
 
   const addThemeIfNew = useCallback(
     (newTag: string) => {
-      setTags((prev) => {
-        if (prev.includes(newTag)) return prev;
-        return [...prev, newTag];
-      });
-      setExistingThemes((prev) => {
-        if (prev.includes(newTag)) return prev;
-        return [...prev, newTag];
-      });
+      const clean = newTag.trim();
+      if (!clean) return;
+      setTags((prev) => (prev.includes(clean) ? prev : [...prev, clean]));
+      setExistingThemes((prev) => (prev.includes(clean) ? prev : [...prev, clean]));
     },
     [setExistingThemes]
   );
@@ -163,9 +151,7 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
       if (e.key === 'Enter' || e.key === ',') {
         e.preventDefault();
         const newTag = tagInput.replace(/^\/+/, '').trim();
-        if (newTag) {
-          addThemeIfNew(newTag);
-        }
+        if (newTag) addThemeIfNew(newTag);
         setTagInput('');
         setSuggestions([]);
       }
@@ -177,19 +163,14 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
     setTags((prev) => prev.filter((t) => t !== tag));
   }, []);
 
-  const handleThumbnailChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const f = e.target.files?.[0];
-      if (!f) return;
-      setThumbnailFile(f);
-      const url = URL.createObjectURL(f);
-      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
-        URL.revokeObjectURL(thumbnailPreview);
-      }
-      setThumbnailPreview(url);
-    },
-    [thumbnailPreview]
-  );
+  const handleThumbnailChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setThumbnailFile(f);
+    const url = URL.createObjectURL(f);
+    if (thumbnailPreview?.startsWith('blob:')) URL.revokeObjectURL(thumbnailPreview);
+    setThumbnailPreview(url);
+  }, [thumbnailPreview]);
 
   const handleTagInputChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -197,11 +178,7 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
       setTagInput(v);
       if (v.startsWith('/')) {
         const query = v.slice(1).toLowerCase();
-        setSuggestions(
-          existingThemes.filter((t) =>
-            t.toLowerCase().startsWith(query)
-          )
-        );
+        setSuggestions(existingThemes.filter((t) => t.toLowerCase().startsWith(query)));
       } else {
         setSuggestions([]);
       }
@@ -213,259 +190,145 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
     async (e: FormEvent) => {
       e.preventDefault();
       setError('');
-      setIsUploading(true);
 
+      const cleanTitle = title.trim();
+      if (!cleanTitle) {
+        const msg = 'Le titre est requis';
+        setError(msg);
+        toastError(msg);
+        return;
+      }
+
+      setIsUploading(true);
       try {
         const {
           data: { session },
           error: sessionError,
         } = await supabase.auth.getSession();
-        if (sessionError || !session?.user) {
-          throw new Error(TEXT.unauthenticated);
-        }
+        if (sessionError || !session?.user) throw new Error(TEXT.unauthenticated);
         const user = session.user;
 
         let thumbnailUrl: string | null = null;
         if (thumbnailFile) {
-          const result = await uploadFileToBucket(
-            THUMBNAIL_BUCKET,
-            thumbnailFile
-          );
-          if (result?.publicUrl) {
-            thumbnailUrl = result.publicUrl;
-          }
+          const result = await uploadFileToBucket(THUMBNAIL_BUCKET, thumbnailFile);
+          if (result?.publicUrl) thumbnailUrl = result.publicUrl;
+          else toastInfo("Miniature non enregistrée (problème d'upload).");
         }
 
         if (editingVideo) {
           const updates: Record<string, unknown> = {
-            title: title.trim(),
+            title: cleanTitle,
             description: description.trim() || null,
             themes: tags,
             ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
           };
 
-          const { error: updateError } = await supabase
-            .from('videos')
-            .update(updates)
-            .eq('id', editingVideo.id);
-
+          const { error: updateError } = await supabase.from('videos').update(updates).eq('id', editingVideo.id);
           if (updateError) throw updateError;
+
+          toastSuccess('Vidéo mise à jour.');
         } else {
           if (!file) {
-            setError(TEXT.noFileSelected);
+            const msg = TEXT.noFileSelected;
+            setError(msg);
+            toastError(msg);
             return;
           }
 
           const videoUpload = await uploadFileToBucket(VIDEO_BUCKET, file);
-          if (!videoUpload?.publicUrl) {
-            throw new Error("Échec de l'upload de la vidéo");
-          }
-          const publicUrl = videoUpload.publicUrl;
+          if (!videoUpload?.publicUrl || !videoUpload.path) throw new Error("Échec de l'upload de la vidéo");
 
           let durationIso = '';
           try {
-            const durationSeconds = await getNativeVideoDuration(publicUrl);
+            const durationSeconds = await getNativeVideoDuration(videoUpload.publicUrl);
             durationIso = secondsToISODuration(durationSeconds);
           } catch (e: unknown) {
             console.warn('Impossible de récupérer durée native', e);
           }
 
           const videoData: Record<string, unknown> = {
-            title: title.trim(),
+            title: cleanTitle,
             description: description.trim() || null,
             themes: tags,
             user_id: user.id,
             type: 'native',
-            url: publicUrl,
+            url: videoUpload.publicUrl,
+            storage_path: videoUpload.path, // for suppression later
             ...(durationIso ? { duration: durationIso } : {}),
             ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
           };
 
-          const { error: dbError } = await supabase
-            .from('videos')
-            .insert([videoData]);
-
+          const { error: dbError } = await supabase.from('videos').insert([videoData]);
           if (dbError) throw dbError;
+
+          toastSuccess('Vidéo publiée.');
         }
 
         onSuccess();
         onClose();
       } catch (err: any) {
-        setError(
-          typeof err?.message === 'string'
-            ? err.message
-            : TEXT.errorGeneric
-        );
+        const msg = typeof err?.message === 'string' ? err.message : TEXT.errorGeneric;
+        setError(msg);
+        toastError(msg);
       } finally {
         setIsUploading(false);
       }
     },
-    [
-      editingVideo,
-      title,
-      description,
-      tags,
-      thumbnailFile,
-      file,
-      onClose,
-      onSuccess,
-    ]
+    [editingVideo, title, description, tags, thumbnailFile, file, onClose, onSuccess, toastError, toastSuccess, toastInfo]
   );
 
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={editingVideo ? TEXT.editVideo : TEXT.publishVideo}>
-      <div className="modal-content">
-        <div className="modal-inner" style={{ padding: 24 }}>
-          <h3 className="modal-title">
-            {editingVideo ? TEXT.editVideo : TEXT.publishVideo}
-          </h3>
-          <form onSubmit={handleSubmit} className="form-column">
-            <div className="field-group">
-              <label htmlFor="video-title" className="label">
-                {TEXT.title}
-              </label>
-              <input
-                id="video-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                className="input"
-              />
-            </div>
-
-            <div className="field-group">
-              <label htmlFor="video-description" className="label">
-                {TEXT.descriptionOptional}
-              </label>
-              <textarea
-                id="video-description"
-                placeholder={TEXT.descriptionOptional}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="textarea"
-              />
-            </div>
-
-            <div className="field-group" style={{ position: 'relative' }}>
-              <div className="tags-container">
-                {tags.map((t) => (
-                  <div key={t} className="tag-pill">
-                    {t}
-                    <button
-                      type="button"
-                      aria-label={TEXT.themeRemoveAria(t)}
-                      onClick={() => removeTag(t)}
-                      className="tag-remove-btn"
-                    >
-                      <XIcon width={12} height={12} />
-                    </button>
-                  </div>
-                ))}
-                <input
-                  placeholder={TEXT.tagsPlaceholder}
-                  value={tagInput}
-                  onChange={handleTagInputChange}
-                  onKeyDown={handleTagKeyDown}
-                  className="input-inline"
-                  aria-label="Ajout de tag"
-                />
-              </div>
-              {suggestions.length > 0 && (
-                <ul className="suggestions-list" aria-label={TEXT.suggestionsListLabel}>
-                  {suggestions.map((s) => (
-                    <li
-                      key={s}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => addThemeIfNew(s)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') addThemeIfNew(s);
-                      }}
-                      className="suggestion-item"
-                    >
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {file && (
-              <div className="field-group">
-                <div style={{ fontSize: 14 }}>
-                  {TEXT.selectedFile} <strong>{file.name}</strong>
+    <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+      <div className={styles.modalContent}>
+        <h3 className={styles.modalTitle}>{editingVideo ? TEXT.editVideo : TEXT.publishVideo}</h3>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.fieldGroup}>
+            <label htmlFor="video-title" className={styles.label}>{TEXT.title}</label>
+            <input id="video-title" value={title} onChange={(e) => setTitle(e.target.value)} className={styles.input} />
+          </div>
+          <div className={styles.fieldGroup}>
+            <label htmlFor="video-description" className={styles.label}>{TEXT.descriptionOptional}</label>
+            <textarea id="video-description" value={description} onChange={(e) => setDescription(e.target.value)} className={styles.textarea} />
+          </div>
+          <div className={styles.fieldGroup}>
+            <div className={styles.tagsContainer}>
+              {tags.map((t) => (
+                <div key={t} className={styles.tagPill}>
+                  {t}
+                  <button type="button" onClick={() => removeTag(t)} className={styles.tagRemoveBtn}>
+                    <XIcon width={12} height={12} />
+                  </button>
                 </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="field-group" role="alert">
-                <p style={{ color: 'red' }}>{error}</p>
-              </div>
-            )}
-
-            <div className="field-group">
-              <label htmlFor="thumbnail" className="label">
-                {TEXT.thumbnailLabel}
-              </label>
-              <div className="thumbnail-picker">
-                {thumbnailPreview ? (
-                  <img
-                    src={thumbnailPreview}
-                    alt="Aperçu miniature"
-                    className="thumbnail-preview"
-                  />
-                ) : editingVideo && (editingVideo as any).thumbnail ? (
-                  <img
-                    src={(editingVideo as any).thumbnail}
-                    alt="Miniature existante"
-                    className="thumbnail-preview"
-                  />
-                ) : (
-                  <div className="thumbnail-placeholder">
-                    {TEXT.noThumbnail}
-                  </div>
-                )}
-                <input
-                  id="thumbnail"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleThumbnailChange}
-                />
-              </div>
+              ))}
+              <input
+                placeholder={TEXT.tagsPlaceholder}
+                value={tagInput}
+                onChange={handleTagInputChange}
+                onKeyDown={handleTagKeyDown}
+                className={styles.input}
+              />
             </div>
-
-            <div
-              className="actions"
-              style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}
-            >
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn-secondary"
-                disabled={isUploading}
-              >
-                {TEXT.cancel}
-              </button>
-              <button
-                type="submit"
-                disabled={isUploading}
-                className="btn-primary"
-                aria-busy={isUploading}
-              >
-                {isUploading
-                  ? editingVideo
-                    ? TEXT.updating
-                    : TEXT.publishing
-                  : editingVideo
-                  ? TEXT.update
-                  : TEXT.publish}
-              </button>
+          </div>
+          <div className={styles.fieldGroup}>
+            <label htmlFor="thumbnail" className={styles.label}>{TEXT.thumbnailLabel}</label>
+            <div className={styles.thumbnailPicker}>
+              {thumbnailPreview ? (
+                <img src={thumbnailPreview} alt="Aperçu" className={styles.thumbnailPreview} />
+              ) : (
+                <div className={styles.thumbnailPlaceholder}>{TEXT.noThumbnail}</div>
+              )}
+              <input id="thumbnail" type="file" accept="image/*" onChange={handleThumbnailChange} />
             </div>
-          </form>
-        </div>
+          </div>
+          <div className={styles.actions}>
+            <button type="button" onClick={onClose} className={styles.btnSecondary}>{TEXT.cancel}</button>
+            <button type="submit" disabled={isUploading} className={styles.btnPrimary}>
+              {isUploading ? (editingVideo ? TEXT.updating : TEXT.publishing) : editingVideo ? TEXT.update : TEXT.publish}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

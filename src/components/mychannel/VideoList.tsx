@@ -1,6 +1,7 @@
+import React, { FC, memo, useCallback } from 'react';
 import { Video } from '@/types';
 import { parseThemes } from '@/lib/utils';
-import React, { useMemo, useCallback, FC, memo } from 'react';
+import styles from './MyChannel.module.css';
 
 const TEXT = {
   noVideos: 'Aucune vidéo à afficher.',
@@ -16,43 +17,20 @@ interface VideoListProps {
   onDelete: (video: Video) => void;
 }
 
-interface ThumbnailProps {
-  title: string;
-  thumbnail?: string;
+function safeParseThemes(raw: unknown): string[] {
+  try {
+    return parseThemes(raw as any);
+  } catch {
+    return [];
+  }
 }
 
-const Thumbnail: FC<ThumbnailProps> = memo(({ title, thumbnail }) => {
+const ThemeTags: FC<{ themes: string[] }> = memo(({ themes }) => {
+  if (!themes.length) return null;
   return (
-    <div className="thumbnail-wrapper">
-      {thumbnail ? (
-        <img
-          src={thumbnail}
-          alt={`Miniature de ${title}`}
-          className="thumbnail-image"
-        />
-      ) : (
-        <div
-          className="thumbnail-placeholder"
-          aria-label={TEXT.noThumbnail}
-          role="img"
-        >
-          {TEXT.noThumbnail}
-        </div>
-      )}
-    </div>
-  );
-});
-
-interface ThemeTagsProps {
-  themes: string[];
-}
-
-const ThemeTags: FC<ThemeTagsProps> = memo(({ themes }) => {
-  if (themes.length === 0) return null;
-  return (
-    <div className="theme-tags">
+    <div className={styles.tagList}>
       {themes.map((t) => (
-        <span key={t} className="tag-pill">
+        <span key={t} className={styles.tagPill}>
           {t}
         </span>
       ))}
@@ -60,63 +38,66 @@ const ThemeTags: FC<ThemeTagsProps> = memo(({ themes }) => {
   );
 });
 
-interface ActionButtonsProps {
+const ActionButtons: FC<{
   video: Video;
-  onEdit: (video: Video) => void;
-  onDelete: (video: Video) => void;
-}
-
-const ActionButtons: FC<ActionButtonsProps> = ({ video, onEdit, onDelete }) => {
+  onEdit: (v: Video) => void;
+  onDelete: (v: Video) => void;
+}> = ({ video, onEdit, onDelete }) => {
   const handleEdit = useCallback(() => onEdit(video), [onEdit, video]);
   const handleDelete = useCallback(() => onDelete(video), [onDelete, video]);
-
   return (
-    <div className="action-buttons">
-      <button type="button" onClick={handleEdit} className="btn edit">
+    <div className={styles.actions}>
+      <button type="button" onClick={handleEdit}>
         {TEXT.edit}
       </button>
-      <button type="button" onClick={handleDelete} className="btn delete">
+      <button type="button" onClick={handleDelete}>
         {TEXT.delete}
       </button>
     </div>
   );
 };
 
+const Thumbnail: FC<{ title: string; thumbnail?: string | null }> = memo(({ title, thumbnail }) => {
+  const placeholder =
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect width="100%" height="100%" fill="#F0F0F0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="100" fill="#666">Pas de miniature</text></svg>`
+    );
+
+  return (
+    <img
+      className={styles.videoThumbnail}
+      src={thumbnail || placeholder}
+      alt={thumbnail ? `Miniature de ${title}` : TEXT.noThumbnail}
+      loading="lazy"
+    />
+  );
+});
+
 const VideoList: FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
-  if (videos.length === 0) {
-    return <div className="video-list-empty">{TEXT.noVideos}</div>;
+  if (!videos.length) {
+    return <div className={styles.textCenter}>{TEXT.noVideos}</div>;
   }
 
   return (
-    <div className="video-list">
+    <div className={styles.mainContent}>
       {videos.map((v) => {
-        // Pre-calculate themes with error handling
-        const themes = useMemo<string[]>(() => {
-          try {
-            return parseThemes(v.themes);
-          } catch {
-            return [];
-          }
-        }, [v.themes]);
-
+        const themes = safeParseThemes((v as any).themes);
         return (
-          <div
-            key={v.id}
-            className="video-card"
-            aria-label={`${TEXT.videoLabelPrefix} ${v.title}`}
-          >
-            <div className="video-header">
-              <Thumbnail title={v.title} thumbnail={v.thumbnail ?? undefined} />
-              <div className="video-info">
-                <h4 className="video-title">{v.title}</h4>
-                {v.description && (
-                  <p className="video-description">{v.description}</p>
-                )}
+          <article key={v.id} className={styles.videoCard} aria-label={`${TEXT.videoLabelPrefix} ${v.title}`}>
+            <Thumbnail title={v.title} thumbnail={(v as any).thumbnail ?? null} />
+            <div className={styles.videoContent}>
+              <header className={styles.videoHeader}>
+                <h4 className={styles.videoTitle}>{v.title}</h4>
+                {v.description && <p className={styles.videoDescription}>{v.description}</p>}
+              </header>
+
+              <footer className={styles.videoFooter}>
                 <ThemeTags themes={themes} />
-              </div>
+                <ActionButtons video={v} onEdit={onEdit} onDelete={onDelete} />
+              </footer>
             </div>
-            <ActionButtons video={v} onEdit={onEdit} onDelete={onDelete} />
-          </div>
+          </article>
         );
       })}
     </div>

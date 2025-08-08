@@ -12,9 +12,6 @@ export default function VideoDetailPage() {
   const router = useRouter()
   const { id } = router.query
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
-  const handleCreateClick = () => {
-    router.push('/videos/create')
-  }
 
   const [video, setVideo] = useState<Video | null>(null)
   const [userRating, setUserRating] = useState<number>(0)
@@ -76,7 +73,7 @@ export default function VideoDetailPage() {
 
   return (
     <>
-      <Topbar active="videos" onCreateClick={handleCreateClick} />
+      <Topbar />
       <div className="page-wrapper container">
         <Sidebar active="videos" />
         <main className="main-content">
