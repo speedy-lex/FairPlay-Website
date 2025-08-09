@@ -17,7 +17,7 @@ export const DevBanner = () => {
 
   return (
     <div className="info-banner">
-      <span className="info-banner-text">🚧 Note: This site is currently under development !</span>
+      <span className="info-banner-text">🚧 Note: This site is a demo currently in development, not the final website!</span>
       <button className="close-btn" onClick={handleClose}>✖</button>
     </div>
   );
