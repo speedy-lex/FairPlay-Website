@@ -2,6 +2,8 @@
 
 This project uses **Next.js** with **Supabase** for backend services. All application code lives under the `src/` directory.
 
+## Note : This website is just a "proof of concept", it is not de final product. 
+
 ## Setup
 
 1. Install dependencies:
