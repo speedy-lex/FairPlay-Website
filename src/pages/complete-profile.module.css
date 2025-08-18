@@ -1,0 +1,123 @@
+/* Variables inspirées de login.module.css */
+:root {
+  --color-light-gray: #f5f5f5;
+  --color-medium-gray: #888;
+  --color-dark-gray: #333;
+  --color-white: #ffffff;
+  --color-accent: #6a8efb; /* Bleu clair */
+  --color-accent-dark: #557ee0; /* Bleu plus foncé au survol */
+  --color-text-light: #666; /* Pour les paragraphes */
+}
+
+.page {
+  min-height: 100vh;
+  background-color: var(--color-light-gray);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrer horizontalement */
+  justify-content: center; /* Centrer verticalement */
+  padding: 2rem; /* Espace autour du contenu */
+  box-sizing: border-box; /* Inclure le padding dans la largeur/hauteur */
+}
+
+.profileCard {
+  max-width: 500px; /* Largeur maximale comme dans le fichier original */
+  width: 100%; /* S'adapte à la largeur du parent */
+  background-color: var(--color-white);
+  border: 1px solid var(--color-light-gray);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  padding: 2rem;
+  box-sizing: border-box; /* Inclure le padding dans la largeur/hauteur */
+}
+
+.title {
+  margin: 0 0 1.5rem 0; /* Plus d'espace sous le titre */
+  font-size: 1.75rem;
+  color: var(--color-dark-gray);
+  text-align: center; /* Centrer le titre */
+}
+
+.statusMessage {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-medium-gray);
+}
+
+.form label {
+  display: block;
+  margin-bottom: 1rem;
+  color: var(--color-medium-gray);
+  font-size: 0.95rem;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.form input[type="text"],
+.form input[type="file"] {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--color-dark-gray);
+  background-color: var(--color-white);
+  transition: border-color .2s ease, box-shadow .2s ease;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.form input[type="file"] {
+  padding: 0.65rem 0; /* Ajustement pour l'input file */
+}
+
+.form input[type="text"]:focus,
+.form input[type="file"]:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(106,142,251,0.15);
+}
+
+.form button {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  margin-top: 1.5rem; /* Plus d'espace au-dessus du bouton */
+  transition: background-color .2s ease, transform .02s ease;
+}
+
+.form button:hover {
+  background-color: var(--color-accent-dark);
+}
+
+.form button:active {
+  transform: translateY(1px);
+}
+
+.form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #d14343; /* Rouge pour les erreurs */
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0.25rem;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .profileCard {
+    margin: 1rem; /* Moins de marge sur les petits écrans */
+  }
+}
+

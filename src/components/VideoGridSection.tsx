@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback, FC } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ChevronRightIcon } from '@/components/props/icons';
 import type { Video } from '@/types';
 import { supabase } from '@/lib/supabase';
+import { CategoryFilter } from './CategoryFilter';
 
 interface VideoGridSectionProps {
   loading: boolean;
@@ -16,14 +16,13 @@ interface VideoGridSectionProps {
 }
 
 const TEXT = {
-  loading: 'Chargement…',
-  errorPrefix: 'Erreur :',
-  scoreLabel: '', // keep it there in case...
+  loading: 'Loading…',
+  errorPrefix: 'Error:',
+  scoreLabel: '',
   byPrefix: '',
-  authorPending: 'Auteur…',
-  authorUnknown: 'Auteur inconnu',
+  authorPending: 'Author…',
+  authorUnknown: 'Unknown Author',
   noVideosDuration: '—',
-  categoryScrollAria: 'Faire défiler les catégories',
 };
 
 function formatSecondsToReadable(sec: number): string {
@@ -61,12 +60,9 @@ function parseISODurationFallback(iso: string): string {
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
   const s = Math.floor(totalSeconds % 60);
-  if (h > 0) {
-    return `${h}:${m.toString().padStart(2, '0')}:${s
-      .toString()
-      .padStart(2, '0')}`;
-  }
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  return h > 0
+    ? `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+    : `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 export function VideoGridSection({
@@ -85,55 +81,29 @@ export function VideoGridSection({
   useEffect(() => {
     const fetchMissingAuthors = async () => {
       const userIds = Array.from(
-        new Set(
-          filteredVideos
-            .map((v) => (v as any).user_id)
-            .filter(Boolean) as string[]
-        )
+        new Set(filteredVideos.map((v) => (v as any).user_id).filter(Boolean) as string[])
       );
-      if (userIds.length === 0) {
-        console.warn(
-          '[VideoGridSection] Aucun user_id trouvé dans filteredVideos.'
-        );
-        return;
-      }
+      if (userIds.length === 0) return;
 
       const missing = userIds.filter((id) => !authorMap[id]);
       if (missing.length === 0) return;
 
       setLoadingAuthors(true);
       try {
-        const { data, error: fetchError } = await supabase
+        const { data } = await supabase
           .from('profiles')
           .select('id, username')
           .in('id', missing);
 
-        if (fetchError) {
-          console.error(
-            '[VideoGridSection] Erreur récupération des profils :',
-            fetchError
-          );
-        } else if (data) {
+        if (data) {
           setAuthorMap((prev) => {
             const copy = { ...prev };
             data.forEach((p) => {
-              if (p.id) {
-                copy[p.id] = p.username || '(username vide)';
-              }
+              if (p.id) copy[p.id] = p.username || '(username vide)';
             });
             return copy;
           });
-        } else {
-          console.warn(
-            '[VideoGridSection] Réponse Supabase sans data ni erreur :',
-            missing
-          );
         }
-      } catch (e) {
-        console.error(
-          '[VideoGridSection] Exception pendant fetchMissingAuthors :',
-          e
-        );
       } finally {
         setLoadingAuthors(false);
       }
@@ -144,25 +114,13 @@ export function VideoGridSection({
 
   return (
     <section className="video-grid-section custom-scrollbar">
-      <div className="category-filters">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`category-button ${
-              category === selectedCategory ? 'active' : 'inactive'
-            }`}
-          >
-            {category}
-          </button>
-        ))}
-        <button
-          className="category-scroll-button"
-          aria-label={TEXT.categoryScrollAria}
-        >
-          <ChevronRightIcon />
-        </button>
-      </div>
+      {/* ✅ Nouveau composant importé */}
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        ariaLabel="Faire défiler les catégories"
+      />
 
       {loading ? (
         <p className="video-meta">{TEXT.loading}</p>
@@ -183,51 +141,27 @@ export function VideoGridSection({
             if (video.type === 'youtube') {
               if (typeof normalized === 'string') {
                 const fromProp = parseISODuration(normalized);
-                if (fromProp && fromProp !== normalized) {
-                  durationDisplay = fromProp;
-                } else {
-                  durationDisplay = parseISODurationFallback(normalized);
-                }
+                durationDisplay =
+                  fromProp && fromProp !== normalized
+                    ? fromProp
+                    : parseISODurationFallback(normalized);
               } else if (typeof normalized === 'number') {
                 durationDisplay = formatSecondsToReadable(normalized);
               }
             } else {
-              // native or other
               if (typeof normalized === 'string' && normalized.startsWith('P')) {
                 const fromProp = parseISODuration(normalized);
-                if (fromProp && fromProp !== normalized) {
-                  durationDisplay = fromProp;
-                } else {
-                  durationDisplay = parseISODurationFallback(normalized);
-                  if (durationDisplay === TEXT.noVideosDuration) {
-                    console.warn(
-                      '[VideoGridSection] Impossible de parser la durée ISO native :',
-                      { originalRaw, videoId: video.id, videoTitle: video.title }
-                    );
-                  }
-                }
+                durationDisplay =
+                  fromProp && fromProp !== normalized
+                    ? fromProp
+                    : parseISODurationFallback(normalized);
               } else if (typeof normalized === 'number') {
                 durationDisplay = formatSecondsToReadable(normalized);
               }
             }
 
-            if (
-              durationDisplay === TEXT.noVideosDuration &&
-              (normalized == null || normalized === '')
-            ) {
-              console.warn(
-                '[VideoGridSection] Durée absente ou invalide pour la vidéo :',
-                { originalRaw, videoId: video.id, videoTitle: video.title }
-              );
-            }
-
             return (
-              <Link
-                key={video.id}
-                href={`/video/${video.id}`}
-                legacyBehavior
-                passHref
-              >
+              <Link key={video.id} href={`/video/${video.id}`} legacyBehavior passHref>
                 <a className="video-card">
                   <div className="video-thumbnail-container">
                     {(video as any).thumbnail ? (
@@ -301,65 +235,6 @@ export function VideoGridSection({
           padding: 0;
           overflow-y: auto;
           background-color: #f0f0f0;
-        }
-
-        .category-filters {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 20px;
-          flex-wrap: wrap;
-          justify-content: center;
-          background: white;
-          padding: 10px;
-          border-radius: 8px;
-          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.03);
-        }
-
-        .category-button {
-          background-color: var(--color-light-gray);
-          border: 1px solid var(--color-light-gray);
-          color: var(--color-medium-gray);
-          padding: 8px 16px;
-          border-radius: 8px;
-          font-size: 0.9em;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .category-button:hover {
-          background-color: var(--color-accent);
-          color: var(--color-white);
-          border-color: var(--color-accent);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(106, 142, 251, 0.2);
-        }
-
-        .category-button.active {
-          background-color: var(--color-accent);
-          color: var(--color-white);
-          border-color: var(--color-accent);
-          box-shadow: 0 2px 8px rgba(106, 142, 251, 0.2);
-        }
-
-        .category-scroll-button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 40px;
-          height: 40px;
-          background: none;
-          border: none;
-          color: var(--color-medium-gray);
-          cursor: pointer;
-          font-size: 1.5em;
-          border-radius: 50%;
-          transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .category-scroll-button:hover {
-          background-color: var(--color-light-gray);
-          color: var(--color-dark-gray);
         }
 
         .video-meta {

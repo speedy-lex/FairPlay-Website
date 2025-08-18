@@ -1,24 +1,25 @@
 import { useEffect, useState, useCallback, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/router';
+import styles from './complete-profile.module.css'; // Import des styles
 
 const TEXT = {
-  title: 'Finalisation du profil',
-  completingSession: 'Récupération de session...',
-  sessionActive: 'Session active, complète ton profil',
-  sessionRetrieved: 'Session récupérée, complète ton profil',
-  noValidSession: "Pas de session valide après échange de token.",
-  needUsername: 'Le pseudo est requis.',
-  unexpectedError: 'Erreur inattendue :',
-  unexpectedFinalError: 'Erreur inattendue lors de la finalisation :',
+  title: 'Finalizing profile',
+  completingSession: 'Recovering session...',
+  sessionActive: 'Session active, complete your profile',
+  sessionRetrieved: 'Session retrieved, complete your profile',
+  noValidSession: "No valid session after token exchange.",
+  needUsername: 'Username is required.',
+  unexpectedError: 'Unexpected error:',
+  unexpectedFinalError: 'Unexpected error during finalization:',
   profileErrorRls:
-    "Erreur profil : nouvelle ligne viole la policy de sécurité. Vérifie que les policies RLS permettent à l’utilisateur de gérer son propre profil (auth.uid() = id).",
-  finalizeButton: 'Finaliser mon profil',
-  submitting: 'En cours...',
-  avatarOptional: 'Avatar (optionnel)',
-  usernameLabel: 'Pseudo',
+    "Profile error: new row violates security policy. Check that RLS policies allow the user to manage their own profile (auth.uid() = id).",
+  finalizeButton: 'Finalize my profile',
+  submitting: 'Submitting...',
+  avatarOptional: 'Avatar (optional)',
+  usernameLabel: 'Username',
   errorFallback:
-    "Si tu as confirmé ton e-mail, recharge ou reconnecte-toi.",
+    "If you confirmed your email, please refresh or log in again.",
 };
 
 type UserType = {
@@ -180,64 +181,67 @@ export default function CompleteProfile() {
 
   if (error) {
     return (
-      <div style={{ padding: 20 }}>
-        <h2>{TEXT.title}</h2>
-        <p style={{ color: 'red' }}>{error}</p>
-        <p>{TEXT.errorFallback}</p>
+      <div className={styles.page}>
+        <div className={styles.profileCard}>
+          <h2 className={styles.title}>{TEXT.title}</h2>
+          <p className={styles.error}>{error}</p>
+          <p className={styles.statusMessage}>{TEXT.errorFallback}</p>
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div style={{ padding: 20 }}>
-        <h2>{TEXT.title}</h2>
-        <p>{status}</p>
+      <div className={styles.page}>
+        <div className={styles.profileCard}>
+          <h2 className={styles.title}>{TEXT.title}</h2>
+          <p className={styles.statusMessage}>{status}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: 20, maxWidth: 500, margin: '0 auto' }}>
-      <h2>{TEXT.title}</h2>
-      <p>{status}</p>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 10 }}>
-          <label htmlFor="username-input" style={{ display: 'block' }}>
-            {TEXT.usernameLabel}
-          </label>
-          <input
-            id="username-input"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            style={{ display: 'block', width: '100%', padding: 8, marginTop: 4 }}
-          />
-        </div>
-        <div style={{ marginBottom: 10 }}>
-          <label htmlFor="avatar-upload" style={{ display: 'block' }}>
-            {TEXT.avatarOptional}
-          </label>
-          <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files?.[0]) setAvatarFile(e.target.files[0]);
-            }}
-            style={{ display: 'block', marginTop: 4 }}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          style={{ padding: '10px 20px' }}
-          aria-busy={isSubmitting}
-        >
-          {isSubmitting ? TEXT.submitting : TEXT.finalizeButton}
-        </button>
-      </form>
+    <div className={styles.page}>
+      <div className={styles.profileCard}>
+        <h2 className={styles.title}>{TEXT.title}</h2>
+        <p className={styles.statusMessage}>{status}</p>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div>
+            <label htmlFor="username-input">
+              {TEXT.usernameLabel}
+            </label>
+            <input
+              id="username-input"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div style={{ marginBottom: '1rem' }}> {/* Ajout d'une marge pour l'input file */}
+            <label htmlFor="avatar-upload">
+              {TEXT.avatarOptional}
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files?.[0]) setAvatarFile(e.target.files[0]);
+              }}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+          >
+            {isSubmitting ? TEXT.submitting : TEXT.finalizeButton}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -7,18 +7,18 @@ import styles from './login.module.css';
 
 const TEXT = {
   title: 'Authentification',
-  loginTab: 'Connexion',
-  registerTab: 'Inscription',
+  loginTab: 'Login',
+  registerTab: 'Signup',
   email: 'Email',
-  password: 'Mot de passe',
-  confirmPassword: 'Confirmer le mot de passe',
-  username: 'Pseudo',
-  loginButton: 'Se connecter',
-  registerButton: "S'inscrire",
-  passwordMismatch: 'Les mots de passe ne correspondent pas.',
-  usernameRequired: 'Le pseudo est requis.',
+  password: 'Password',
+  confirmPassword: 'Confirm Password',
+  username: 'Username',
+  loginButton: 'Login',
+  registerButton: 'Signup',
+  passwordMismatch: 'Passwords do not match.',
+  usernameRequired: 'Username is required.',
   confirmationSent:
-    'Un email de confirmation a été envoyé. Veuillez vérifier votre boîte de réception.',
+    'A confirmation email has been sent. Please check your inbox.',
   authTitle: 'Auth',
 };
 
@@ -226,8 +226,8 @@ export default function Auth() {
         </div>
         <aside className={styles.right} aria-hidden="true">
           <div className={styles.illustration}>
-            <h2>Bienvenue !</h2>
-            <p>Accédez à des vidéos de qualités</p>
+            <h2>Welcome !</h2>
+            <p>Access high-quality videos</p>
           </div>
         </aside>
       </section>
