@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { supabase } from '@/lib/supabase';
 import { Topbar } from '@/components/Topbar';
 import styles from './login.module.css';
+import Link from 'next/link';
+import { redirect } from 'next/dist/server/api-utils';
 
 const TEXT = {
   title: 'Authentification',
@@ -19,7 +21,8 @@ const TEXT = {
   usernameRequired: 'Username is required.',
   confirmationSent:
     'A confirmation email has been sent. Please check your inbox.',
-  authTitle: 'Auth',
+  pageTitle: 'Login - FairPlay',
+  forgottenPassword: 'Forgot Password ?',
 };
 
 type Tab = 'login' | 'register';
@@ -31,6 +34,7 @@ export default function Auth() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [loginInfo, setLoginInfo] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
   const [registerEmail, setRegisterEmail] = useState('');
@@ -74,6 +78,7 @@ export default function Auth() {
 
   const handleRegister = useCallback(
     async (e: FormEvent) => {
+      resetErrors();
       e.preventDefault();
       if (registerLoading) return;
       setRegisterError('');
@@ -117,6 +122,23 @@ export default function Auth() {
     },
     [registerEmail, registerPassword, registerConfirmPassword, registerUsername, registerLoading]
   );
+  const handleForgotPassword = useCallback(async () => {
+    resetErrors();
+    if (!loginEmail) {  
+      setLoginError('Please enter your email.');
+      return;
+    }
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(loginEmail,{redirectTo: 'http://localhost:3000/resetpassword'});
+      if (error) {
+        setLoginError(error.message);
+      } else {
+        setLoginInfo('A password reset email has been sent.');
+      }
+    } catch (err) {
+      setLoginError('An error occurred while sending the reset email.');
+    }
+  }, [loginEmail]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -128,7 +150,7 @@ export default function Auth() {
     <div className={styles.page}>
       <Topbar />
       <Head>
-        <title>{TEXT.authTitle}</title>
+        <title>{TEXT.pageTitle}</title>
       </Head>
       <section className={styles.auth}>
         <div className={styles.left}>
@@ -170,6 +192,8 @@ export default function Auth() {
                     required
                   />
                 </label>
+                <span className='forgottenPassword' onClick={handleForgotPassword}>{TEXT.forgottenPassword}</span>
+                {loginInfo && <p className={styles.info}>{loginInfo}</p>}
                 {loginError && <p className={styles.error}>{loginError}</p>}
                 <button type="submit" disabled={loginLoading}>
                   {loginLoading ? '…' : TEXT.loginButton}

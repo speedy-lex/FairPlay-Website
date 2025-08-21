@@ -198,7 +198,8 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
         toastError(msg);
         return;
       }
-
+      toastInfo('La publication est désactivée pour le moment.');
+      /*
       setIsUploading(true);
       try {
         const {
@@ -272,7 +273,7 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
         toastError(msg);
       } finally {
         setIsUploading(false);
-      }
+      }*/
     },
     [editingVideo, title, description, tags, thumbnailFile, file, onClose, onSuccess, toastError, toastSuccess, toastInfo]
   );

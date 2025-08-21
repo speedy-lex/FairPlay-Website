@@ -141,7 +141,11 @@
   font-size: 0.9rem;
   margin: 0.5rem 0 0.25rem;
 }
-
+.info {
+  color: #1a7f37;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0.25rem;
+}
 .success {
   color: #1a7f37;
   font-size: 0.9rem;

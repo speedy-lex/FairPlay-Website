@@ -8,6 +8,9 @@ import { parseThemes } from '@/lib/utils';
 import { Video } from '@/types';
 import { ToastProvider, useToast } from '@/components/props/Toast';
 import styles from '../components/mychannel/MyChannel.module.css';
+import Head from 'next/head';
+import { Topbar } from '@/components/Topbar'
+import { Sidebar } from '@/components/Sidebar'
 
 type ProfileData = {
   username: string;
@@ -86,7 +89,8 @@ function MyChannelInner() {
     const user = await getSessionUser();
     if (!user) {
       toastError('Session expirée. Veuillez vous reconnecter.');
-      router.push('/');
+      setLoadingProfile(false);
+      //router.push('/');
       return;
     }
 
@@ -272,141 +276,149 @@ function MyChannelInner() {
   if (!profile) return <div className={`${styles.textCenter} ${styles.mt10}`}>{TEXT.unableToLoadProfile}</div>;
 
   return (
-    <div className={styles.myChannelContainer}>
-      <div className={styles.mainContent}>
-        <div className={styles.channelCard}>
-          <div className={styles.channelHeader}>
-            <img
-              src={avatarPreview || profile.avatar_url || TEXT.defaultAvatar}
-              alt={`${profile.username} avatar`}
-              width={140}
-              height={140}
-              style={{ borderRadius: '50%' }}
-            />
-            <div>
-              <h2>{profile.username}</h2>
-              <p>{editHandle}</p>
+    <>
+      <Topbar />
+      <div className="page-wrapper container">
+        <Sidebar active="channel" />
+        <main className="main-content">
+          <div className={styles.myChannelContainer}>
+            <div className={styles.mainContent}>
+              <div className={styles.channelCard}>
+                <div className={styles.channelHeader}>
+                  <img
+                    src={avatarPreview || profile.avatar_url || TEXT.defaultAvatar}
+                    alt={`${profile.username} avatar`}
+                    width={140}
+                    height={140}
+                    style={{ borderRadius: '50%' }}
+                  />
+                  <div>
+                    <h2>{profile.username}</h2>
+                    <p>{editHandle}</p>
+                  </div>
+                </div>
+
+                <div className={styles.tabsNav}>
+                  <button
+                    type="button"
+                    className={activeTab === 'stats' ? styles.active : undefined}
+                    onClick={() => setActiveTab('stats')}
+                  >
+                    {TEXT.tabs.stats}
+                  </button>
+                  <button
+                    type="button"
+                    className={activeTab === 'videos' ? styles.active : undefined}
+                    onClick={() => setActiveTab('videos')}
+                  >
+                    {TEXT.tabs.videos}
+                  </button>
+                  <button
+                    type="button"
+                    className={activeTab === 'customization' ? styles.active : undefined}
+                    onClick={() => setActiveTab('customization')}
+                  >
+                    {TEXT.tabs.customization}
+                  </button>
+                </div>
+
+                {activeTab === 'videos' && (
+                  <section>
+                    <h3>{TEXT.manageVideos}</h3>
+                    <div {...getRootProps({ className: styles.dropzone })}>
+                      <input {...getInputProps()} />
+                      {isDragActive ? <p>{TEXT.dropzoneActive}</p> : <p>{TEXT.dropzoneIdle}</p>}
+                    </div>
+
+                    {loadingVideos ? (
+                      <p>{TEXT.loadingProfile.replace('profil', 'vidéos')}...</p>
+                    ) : videos.length === 0 ? (
+                      <p>{TEXT.noVideos}</p>
+                    ) : (
+                      <VideoList videos={videos} onEdit={openEditVideoModal} onDelete={handleDeleteVideo} />
+                    )}
+                  </section>
+                )}
+
+                {activeTab === 'customization' && (
+                  <section>
+                    <h3>{TEXT.customizeChannel}</h3>
+                    <div className={styles.formGroup}>
+                      <label>{TEXT.channelBanner}</label>
+                      <div className={styles.bannerPreview}>
+                        <img src="https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière" alt="Bannière de la chaîne" />
+                        <button type="button">{TEXT.edit}</button>
+                      </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label htmlFor="avatar-upload">{TEXT.profileImage}</label>
+                      <input id="avatar-upload" type="file" onChange={handleAvatarChange} />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label htmlFor="channel-name">{TEXT.channelName}</label>
+                      <input id="channel-name" value={editUsername} onChange={handleUsernameChange} />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label htmlFor="channel-handle">{TEXT.channelHandle}</label>
+                      <input id="channel-handle" value={editHandle} readOnly />
+                    </div>
+
+                    <div className={styles.actions}>
+                      <button onClick={handleSaveProfile} disabled={loadingSave}>
+                        {loadingSave ? TEXT.saving : TEXT.saveChanges}
+                      </button>
+                    </div>
+                  </section>
+                )}
+
+                {activeTab === 'stats' && (
+                  <section>
+                    <h3>{TEXT.myChannelStats}</h3>
+                    <div className={styles.statsGrid}>
+                      <div className={styles.statCard}>
+                        <p>{TEXT.totalViews}</p>
+                        <p>--</p>
+                      </div>
+                      <div className={styles.statCard}>
+                        <p>{TEXT.subscribers}</p>
+                        <p>--</p>
+                      </div>
+                      <div className={styles.statCard}>
+                        <p>{TEXT.publishedVideos}</p>
+                        <p>{videos.length}</p>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                <div className={styles.actions}>
+                  <button type="button" onClick={handleLogout}>{TEXT.logout}</button>
+                </div>
+              </div>
             </div>
+
+            {showModal && (
+              <VideoUploadModal
+                open={showModal}
+                onClose={() => {
+                  setShowModal(false);
+                  setInitialFile(null);
+                  setEditingVideo(null);
+                }}
+                onSuccess={fetchVideos}
+                existingThemes={existingThemes}
+                setExistingThemes={setExistingThemes}
+                initialFile={initialFile}
+                editingVideo={editingVideo}
+              />
+            )}
           </div>
-
-          <div className={styles.tabsNav}>
-            <button
-              type="button"
-              className={activeTab === 'stats' ? styles.active : undefined}
-              onClick={() => setActiveTab('stats')}
-            >
-              {TEXT.tabs.stats}
-            </button>
-            <button
-              type="button"
-              className={activeTab === 'videos' ? styles.active : undefined}
-              onClick={() => setActiveTab('videos')}
-            >
-              {TEXT.tabs.videos}
-            </button>
-            <button
-              type="button"
-              className={activeTab === 'customization' ? styles.active : undefined}
-              onClick={() => setActiveTab('customization')}
-            >
-              {TEXT.tabs.customization}
-            </button>
-          </div>
-
-          {activeTab === 'videos' && (
-            <section>
-              <h3>{TEXT.manageVideos}</h3>
-              <div {...getRootProps({ className: styles.dropzone })}>
-                <input {...getInputProps()} />
-                {isDragActive ? <p>{TEXT.dropzoneActive}</p> : <p>{TEXT.dropzoneIdle}</p>}
-              </div>
-
-              {loadingVideos ? (
-                <p>{TEXT.loadingProfile.replace('profil', 'vidéos')}...</p>
-              ) : videos.length === 0 ? (
-                <p>{TEXT.noVideos}</p>
-              ) : (
-                <VideoList videos={videos} onEdit={openEditVideoModal} onDelete={handleDeleteVideo} />
-              )}
-            </section>
-          )}
-
-          {activeTab === 'customization' && (
-            <section>
-              <h3>{TEXT.customizeChannel}</h3>
-              <div className={styles.formGroup}>
-                <label>{TEXT.channelBanner}</label>
-                <div className={styles.bannerPreview}>
-                  <img src="https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière" alt="Bannière de la chaîne" />
-                  <button type="button">{TEXT.edit}</button>
-                </div>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="avatar-upload">{TEXT.profileImage}</label>
-                <input id="avatar-upload" type="file" onChange={handleAvatarChange} />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="channel-name">{TEXT.channelName}</label>
-                <input id="channel-name" value={editUsername} onChange={handleUsernameChange} />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="channel-handle">{TEXT.channelHandle}</label>
-                <input id="channel-handle" value={editHandle} readOnly />
-              </div>
-
-              <div className={styles.actions}>
-                <button onClick={handleSaveProfile} disabled={loadingSave}>
-                  {loadingSave ? TEXT.saving : TEXT.saveChanges}
-                </button>
-              </div>
-            </section>
-          )}
-
-          {activeTab === 'stats' && (
-            <section>
-              <h3>{TEXT.myChannelStats}</h3>
-              <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                  <p>{TEXT.totalViews}</p>
-                  <p>--</p>
-                </div>
-                <div className={styles.statCard}>
-                  <p>{TEXT.subscribers}</p>
-                  <p>--</p>
-                </div>
-                <div className={styles.statCard}>
-                  <p>{TEXT.publishedVideos}</p>
-                  <p>{videos.length}</p>
-                </div>
-              </div>
-            </section>
-          )}
-
-          <div className={styles.actions}>
-            <button type="button" onClick={handleLogout}>{TEXT.logout}</button>
-          </div>
-        </div>
+        </main>
       </div>
-
-      {showModal && (
-        <VideoUploadModal
-          open={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setInitialFile(null);
-            setEditingVideo(null);
-          }}
-          onSuccess={fetchVideos}
-          existingThemes={existingThemes}
-          setExistingThemes={setExistingThemes}
-          initialFile={initialFile}
-          editingVideo={editingVideo}
-        />
-      )}
-    </div>
+    </>
   );
 }
 
