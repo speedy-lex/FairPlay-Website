@@ -35,7 +35,7 @@ export const Topbar: React.FC = () => {
     <header className="main-header">
       <div className="container">
         <h1 className="logo">
-          <a href="/">FairPlay</a>
+          <a href="home">FairPlay</a>
         </h1>
 
         <div className="search-bar">
