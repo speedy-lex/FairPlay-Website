@@ -1,7 +1,5 @@
 .myChannelContainer {
   max-width: 1100px;
-  margin: 32px auto;
-  padding: 0 20px;
 }
 
 .mainContent {
@@ -9,7 +7,6 @@
   flex-direction: column;
   gap: 24px;
   margin-bottom: 20px;
-  margin-top: 20px;
 }
 
 /* main card */
@@ -73,6 +70,7 @@
   border: 2px dashed var(--color-light-gray);
   border-radius: 14px;
   padding: 24px;
+  margin-bottom: 24px;
   text-align: center;
   color: var(--color-text-light);
   background: var(--color-light-gray);

@@ -5,16 +5,16 @@ import { Topbar } from '@/components/Topbar';
 import { Sidebar } from '@/components/Sidebar';
 import { NotImplementedSection } from '@/components/props/notImplementedSection';
 
-export default function HistoryPage() {
+export default function GamingPage() {
   return (
     <>
       <Head>
-        <title>History - FairPlay</title>
+        <title>Gaming - FairPlay</title>
         <meta name="description" content="FairPlay is a free platform for sharing, discovering and supporting cultural, scientific and creative videos." />
       </Head>
       <Topbar />
       <div className="page-wrapper container">
-        <Sidebar active="history" />
+        <Sidebar active="gaming" />
         <main className="main-content">
           <div className="custom-scrollbar">
             <NotImplementedSection />
