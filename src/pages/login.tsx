@@ -22,7 +22,7 @@ const TEXT = {
   confirmationSent:
     'A confirmation email has been sent. Please check your inbox.',
   pageTitle: 'Login - FairPlay',
-  forgottenPassword: 'Forgot Password ?',
+  loginWithoutPassword: 'Login without Password',
 };
 
 type Tab = 'login' | 'register';
@@ -129,7 +129,10 @@ export default function Auth() {
       return;
     }
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(loginEmail,{redirectTo: 'http://localhost:3000/resetpassword'});
+      const { error } = await supabase.auth.signInWithOtp({
+        email: loginEmail,
+        options: { emailRedirectTo: 'http://localhost:3000/?loginwithoutpassword=true' }
+      });
       if (error) {
         setLoginError(error.message);
       } else {
@@ -192,7 +195,7 @@ export default function Auth() {
                     required
                   />
                 </label>
-                <span className='forgottenPassword' onClick={handleForgotPassword}>{TEXT.forgottenPassword}</span>
+                <span className='loginWithoutPasswordButton' onClick={handleForgotPassword}>{TEXT.loginWithoutPassword}</span>
                 {loginInfo && <p className={styles.info}>{loginInfo}</p>}
                 {loginError && <p className={styles.error}>{loginError}</p>}
                 <button type="submit" disabled={loginLoading}>

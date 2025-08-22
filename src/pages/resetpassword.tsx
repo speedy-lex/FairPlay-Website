@@ -83,7 +83,7 @@ export default function Auth() {
       try {
         localStorage.setItem('pending_username', registerUsername.trim());
 
-        const { error } = await supabase.auth.signInWithIdToken({ provider: 'Email', token: token_hash! });
+        const { error } = await supabase.auth.updateUser({password: registerPassword});
             
 
         if (error) {
@@ -99,13 +99,20 @@ export default function Auth() {
     },
     [registerEmail, registerPassword, registerConfirmPassword, registerUsername, registerLoading]
   );
-
+/*
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace('/');
-    });
-  }, [router]);
-
+    const verify = async () => {
+      if (token_hash && type === 'recovery') {
+        const { error } = await supabase.auth.verifyOtp({
+          type: 'recovery',
+          token: token_hash,
+        });
+        if (error) setRegisterError(error.message);
+      }
+    };
+    verify();
+  }, [token_hash, type]);
+*/
   return (
     <div className={styles.page}>
       <Topbar />

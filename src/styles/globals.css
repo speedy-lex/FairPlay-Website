@@ -183,18 +183,18 @@ p {
   box-shadow: 0 0 0 4px rgba(106,142,251,0.15);
   border-color: var(--color-accent);
 }
-.forgottenPassword {
+.loginWithoutPasswordButton {
   color: var(--color-accent);
   font-size: 0.9em;
   text-decoration:underline;  
   margin-top: 10px;
 } 
-.forgottenPassword:hover {
+.loginWithoutPasswordButton:hover {
   background-color: #fafafa;
   border-color: #e6e6e6;
 }
 
-.forgottenPassword:focus-visible {
+.loginWithoutPasswordButton:focus-visible {
   outline: none;
   box-shadow: 0 0 0 4px rgba(106,142,251,0.15);
   border-color: var(--color-accent);
