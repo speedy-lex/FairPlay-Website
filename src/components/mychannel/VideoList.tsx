@@ -61,14 +61,14 @@ const Thumbnail: FC<{ title: string; thumbnail?: string | null }> = memo(({ titl
   const placeholder =
     'data:image/svg+xml;utf8,' +
     encodeURIComponent(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect width="100%" height="100%" fill="#F0F0F0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="100" fill="#666">Pas de miniature</text></svg>`
+      `<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect width="100%" height="100%" fill="#F0F0F0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="100" fill="#666">No thumbnail</text></svg>`
     );
 
   return (
     <img
       className={styles.videoThumbnail}
       src={thumbnail || placeholder}
-      alt={thumbnail ? `Miniature de ${title}` : TEXT.noThumbnail}
+      alt={thumbnail ? `thumbnail from ${title}` : TEXT.noThumbnail}
       loading="lazy"
     />
   );

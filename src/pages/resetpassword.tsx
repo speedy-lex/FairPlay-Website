@@ -4,12 +4,7 @@ import { useRouter } from 'next/router';
 import { supabase } from '@/lib/supabase';
 import { Topbar } from '@/components/Topbar';
 import styles from './login.module.css';
-import Link from 'next/link';
 import { type EmailOtpType } from '@supabase/supabase-js'
-
-import { NextRequest, NextResponse } from 'next/server'
-
-
 
 const TEXT = {
   title: 'Authentification',
@@ -47,11 +42,6 @@ export default function Auth() {
   //   };
   //   verify();
   // }, [token_hash, type, next, router]);
-
- 
-
-
-
 
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
