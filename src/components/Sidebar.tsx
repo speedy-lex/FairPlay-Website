@@ -41,7 +41,7 @@ export const Sidebar: React.FC<Props> = ({ active }) => {
       <nav className="sidebar-nav">
         <ul>
           <li>
-            <Link href="/" className={active === 'videos' ? 'active' : ''}>
+            <Link href="/feed" className={active === 'videos' ? 'active' : ''}>
               <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Explore
             </Link>
           </li>
