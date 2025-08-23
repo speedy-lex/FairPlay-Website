@@ -8,7 +8,6 @@ import { parseThemes } from '@/lib/utils';
 import { Video } from '@/types';
 import { ToastProvider, useToast } from '@/components/props/Toast';
 import styles from '../components/mychannel/MyChannel.module.css';
-import Head from 'next/head';
 import { Topbar } from '@/components/Topbar'
 import { Sidebar } from '@/components/Sidebar'
 
