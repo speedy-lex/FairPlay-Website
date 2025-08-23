@@ -131,7 +131,7 @@ export default function Auth() {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: loginEmail,
-        options: { emailRedirectTo: 'http://localhost:3000/?loginwithoutpassword=true' }
+        options: { emailRedirectTo: 'https://fairplay.video/?loginwithoutpassword=true' }
       });
       if (error) {
         setLoginError(error.message);
