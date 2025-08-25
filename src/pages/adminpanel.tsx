@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from 'next/router';
 import { supabase } from '@/lib/supabase';
-import { Topbar } from "@/components/Topbar";
-import { Sidebar } from "@/components/Sidebar";
 import Link from "next/link";
 
 export default function AdminPanel() {
@@ -26,28 +24,30 @@ export default function AdminPanel() {
 
     // Récupère la valeur du toggle
     const fetchFeatureEnabled = async () => {
-        const { data } = await supabase
-            .from('settings')
-            .upsert({ name : "ee" ,bool_value: false })
-            /*.select('bool_value')
-            .eq('name', 'is_uploading_enable')
-            .single();*/;
-        //setisuploadingenable(!!data?.bool_value); // force booléen
+        const { data, error } = await supabase
+        .from('settings')
+        .select('bool_value')
+        .eq('name', 'is_uploading_enable')
+        .single();
+
+        if (error) console.error(error);
+        setisuploadingenable(!!data?.bool_value);
     };
 
-    // Met à jour la valeur du toggle et relit la valeur depuis la base
     const handleToggle = async () => {
-        let newValue = !is_uploading_enable;
-        newValue=true
-        const { error, data } = await supabase
-            .from('settings')
-            .update({ bool_value: newValue })
-            .eq('name', 'is_uploading_enable');
-    
-            fetchFeatureEnabled();
-            console.log("Toggle updated:", error);
-            console.log("New value:", newValue);
-        
+    const newValue = !is_uploading_enable;
+
+    setisuploadingenable(newValue);
+
+    const { error } = await supabase
+        .from('settings')
+        .update({ bool_value: newValue })
+        .eq('name', 'is_uploading_enable');
+
+    if (error) {
+        console.error('Update failed:', error);
+        setisuploadingenable(!newValue);
+    }
     };
 
     const handleLogout = useCallback(async () => {
@@ -77,7 +77,7 @@ export default function AdminPanel() {
                             />
                             &nbsp; is uploading enable
                         </label>
-                        <button onClick={handleToggle} style={{ marginLeft: 10 }}>
+                        <button onClick={fetchFeatureEnabled} style={{ marginLeft: 10 }}>
                             Refresh 
                         </button>
                     </div>
