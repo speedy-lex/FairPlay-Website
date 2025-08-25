@@ -44,6 +44,7 @@ const TEXT = {
     customization: 'Customization',
   },
   defaultAvatar: '/default-avatar.png',
+  adminpanelbutton: 'Admin Panel',
 };
 
 function MyChannelInner() {
@@ -71,6 +72,7 @@ function MyChannelInner() {
   const [loadingSave, setLoadingSave] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [initialFile, setInitialFile] = useState<File | null>(null);
+  const [is_admin, setIs_admin] = useState(false);
 
   // === Utils ===
   const getSessionUser = useCallback(async () => {
@@ -95,7 +97,7 @@ function MyChannelInner() {
 
     const { data: profileData, error } = await supabase
       .from('profiles')
-      .select('username, avatar_url')
+      .select('username, avatar_url, is_admin')
       .eq('id', user.id)
       .single();
 
@@ -104,7 +106,9 @@ function MyChannelInner() {
       setLoadingProfile(false);
       return;
     }
-
+    if (profileData.is_admin) {
+      setIs_admin(true);
+    }
     setProfile({ username: profileData.username, avatar_url: profileData.avatar_url });
     setEditUsername(profileData.username || '');
     setAvatarPreview(profileData.avatar_url);
@@ -183,7 +187,7 @@ function MyChannelInner() {
   // === Handlers ===
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
-    router.push('/');
+    router.push('/feed');
   }, [router]);
 
   const handleUsernameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -212,7 +216,7 @@ function MyChannelInner() {
     setLoadingSave(false);
   }, [editUsername, fetchProfile, getSessionUser, profile, toastError, toastSuccess]);
 
-  const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -221,7 +225,45 @@ function MyChannelInner() {
     const url = URL.createObjectURL(file);
     avatarObjectUrlRef.current = url;
     setAvatarPreview(url);
-  }, []);
+
+    // Upload avatar to Supabase storage and update profile
+    const user = await getSessionUser();
+    if (!user) {
+      toastError('Session expirée. Veuillez vous reconnecter.');
+      return;
+    }
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `avatars/${user.id}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, {
+      upsert: true,
+      cacheControl: '3600',
+    });
+
+    if (uploadError) {
+      toastError('Erreur lors du téléchargement de la nouvelle image de profil.');
+      return;
+    }
+
+    const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+    const publicUrl = data?.publicUrl;
+
+    if (publicUrl) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        toastError('Erreur lors de la mise à jour du profil.');
+      } else {
+        toastSuccess('Image de profil mise à jour.');
+        setAvatarPreview(publicUrl);
+        await fetchProfile();
+      }
+    }
+  }, [getSessionUser, toastError, toastSuccess, fetchProfile]);
 
   useEffect(() => {
     return () => {
@@ -294,6 +336,7 @@ function MyChannelInner() {
                   <div>
                     <h2>{profile.username}</h2>
                     <p>{editHandle}</p>
+                    {is_admin && <div className={styles.adminBadge}>Administrateur</div>}
                   </div>
                 </div>
 
@@ -394,6 +437,7 @@ function MyChannelInner() {
                 )}
 
                 <div className={styles.actions}>
+                  {is_admin && <button type="button" onClick={() => router.push("/adminpanel")}>{TEXT.adminpanelbutton}</button>}
                   <button type="button" onClick={handleLogout}>{TEXT.logout}</button>
                 </div>
               </div>

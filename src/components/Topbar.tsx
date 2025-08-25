@@ -28,7 +28,7 @@ export const Topbar: React.FC = () => {
   }, []);
     const handleLogout = useCallback(async () => {
       await supabase.auth.signOut();
-      window.location.href = '/';
+      window.location.href = '/feed';
   }, []);
 
   return (

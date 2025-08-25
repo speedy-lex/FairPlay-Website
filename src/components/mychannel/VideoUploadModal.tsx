@@ -69,7 +69,8 @@ const VIDEO_BUCKET = 'videos';
 type UploadResult = { publicUrl: string; path: string } | null;
 
 async function uploadFileToBucket(bucket: string, file: File): Promise<UploadResult> {
-  const fileName = `${Date.now()}_${file.name}`;
+  const cleanName = sanitizeFileName(file.name);
+  const fileName = `${Date.now()}_${cleanName}`;
   const { data: uploadData, error: uploadError } = await supabase.storage.from(bucket).upload(fileName, file);
   if (uploadError || !uploadData?.path) {
     console.warn(`Erreur upload dans ${bucket}:`, uploadError);
@@ -102,6 +103,7 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [is_uploading_enable, setisuploadingenable] = useState(true);
 
   // Cleanup preview URL on unmount/change
   useEffect(() => {
@@ -114,26 +116,43 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
   useEffect(() => {
     if (!open) return;
 
-    if (editingVideo) {
-      setTitle(editingVideo.title);
-      setDescription(editingVideo.description || '');
-      setTags(normalizeThemes((editingVideo as any).themes));
-      setFile(null);
-      const existingThumb = (editingVideo as any).thumbnail as string | undefined;
-      setThumbnailPreview(existingThumb || null);
-      setThumbnailFile(null);
-    } else {
-      setTitle('');
-      setDescription('');
-      setTags([]);
-      setFile(initialFile);
-      setThumbnailFile(null);
-      setThumbnailPreview(null);
-    }
+    // Wrap async logic in an IIFE
+    (async () => {
+      // Exemple pour récupérer la variable globale
+      const { data, error } = await supabase
+        .from('settings')
+        .select('bool_value')
+        .eq('Name', 'is_uploading_enable')
+        .single();
+      
+      if (data?.bool_value == true) {
+        setisuploadingenable(true);
+      }
+      else {
+        setisuploadingenable(false);
+      }
 
-    setTagInput('');
-    setSuggestions([]);
-    setError('');
+      if (editingVideo) {
+        setTitle(editingVideo.title);
+        setDescription(editingVideo.description || '');
+        setTags(normalizeThemes((editingVideo as any).themes));
+        setFile(null);
+        const existingThumb = (editingVideo as any).thumbnail as string | undefined;
+        setThumbnailPreview(existingThumb || null);
+        setThumbnailFile(null);
+      } else {
+        setTitle('');
+        setDescription('');
+        setTags([]);
+        setFile(initialFile);
+        setThumbnailFile(null);
+        setThumbnailPreview(null);
+      }
+
+      setTagInput('');
+      setSuggestions([]);
+      setError('');
+    })();
   }, [open, editingVideo, initialFile]);
 
   const addThemeIfNew = useCallback(
@@ -198,8 +217,12 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
         toastError(msg);
         return;
       }
-      toastInfo('La publication est désactivée pour le moment.');
-      /*
+      if (!is_uploading_enable) {
+        toastInfo('La publication est désactivée pour le moment.');
+        return;
+      }
+      
+      
       setIsUploading(true);
       try {
         const {
@@ -212,6 +235,8 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
         let thumbnailUrl: string | null = null;
         if (thumbnailFile) {
           const result = await uploadFileToBucket(THUMBNAIL_BUCKET, thumbnailFile);
+          console.log('result',result);
+          console.log('result public url',result?.publicUrl)
           if (result?.publicUrl) thumbnailUrl = result.publicUrl;
           else toastInfo("Miniature non enregistrée (problème d'upload).");
         }
@@ -273,7 +298,7 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
         toastError(msg);
       } finally {
         setIsUploading(false);
-      }*/
+      }
     },
     [editingVideo, title, description, tags, thumbnailFile, file, onClose, onSuccess, toastError, toastSuccess, toastInfo]
   );
@@ -336,3 +361,10 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
 };
 
 export default memo(VideoUploadModal);
+
+function sanitizeFileName(name: string): string {
+  return name
+    .normalize('NFD') // enlève les accents
+    .replace(/[\u0300-\u036f]/g, '') // enlève les diacritiques
+    .replace(/[^a-zA-Z0-9._-]/g, '_'); // remplace tout sauf lettres, chiffres, . _ -
+}

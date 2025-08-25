@@ -44,6 +44,7 @@ export default function Auth() {
   const [registerError, setRegisterError] = useState('');
   const [registerMessage, setRegisterMessage] = useState('');
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [redirectTo, setRedirectTo] = useState('/feed');
 
   const resetErrors = useCallback(() => {
     setLoginError('');
@@ -65,7 +66,7 @@ export default function Auth() {
         if (error) {
           setLoginError(error.message);
         } else {
-          await router.push('/');
+          await router.push(redirectTo);
         }
       } catch {
         setLoginError('Une erreur est survenue lors de la connexion.');
@@ -147,6 +148,11 @@ export default function Auth() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) router.replace('/');
     });
+    const params = new URLSearchParams(window.location.search);
+    const redirect= params.get('redirect');
+    if (redirect) {
+      setRedirectTo(redirect);
+    }
   }, [router]);
 
   return (

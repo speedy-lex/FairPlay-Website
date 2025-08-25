@@ -32,7 +32,7 @@ export default function VideosPage() {
         const { data } = await supabase
             .from('videos')
             .select('id, title, description, type, url, youtube_id, user_id, quality_score, themes, duration, thumbnail')
-            .order('created_at', { ascending: false });
+            .order('quality_score', { ascending: false });
         vids = data || [];
       }
       
@@ -54,6 +54,7 @@ export default function VideosPage() {
   }, []);
 
   useEffect(() => {
+    
     fetchVideos();
     const params = new URLSearchParams(window.location.search);
     const loginwithoutpassword= params.get('loginwithoutpassword');
