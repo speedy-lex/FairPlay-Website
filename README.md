@@ -1,3 +1,5 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/D1D31GU3L5)
+
 # FairPlay
 
 This project uses **Next.js** with **Supabase** for backend services. All application code lives under the `src/` directory.
