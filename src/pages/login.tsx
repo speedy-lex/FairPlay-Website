@@ -59,6 +59,7 @@ export default function Auth() {
   const [isSigningInAutorised, setIsSigningInAutorised] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
+
   const resetErrors = useCallback(() => {
     setLoginError('');
     setRegisterError('');
@@ -69,6 +70,7 @@ export default function Auth() {
     async (e: FormEvent) => {
       e.preventDefault();
       if (loginLoading) return;
+      
       setLoginError('');
       setLoginLoading(true);
       try {
@@ -80,8 +82,11 @@ export default function Auth() {
           setLoginError(error.message);
         } else {
           await router.push(redirectTo);
-        }
+          }
+        
+      
       } catch {
+        setLoginError(TEXT.loginerror);
         setLoginError(TEXT.loginerror);
       } finally {
         setLoginLoading(false);
@@ -133,7 +138,7 @@ export default function Auth() {
 
         setRegisterMessage(TEXT.confirmationSent);
       } catch {
-        setRegisterError("Une erreur est survenue lors de l'inscription.");
+        setRegisterError(TEXT.registerError);
       } finally {
         setRegisterLoading(false);
       }
@@ -144,7 +149,7 @@ export default function Auth() {
   const handleForgotPassword = useCallback(async () => {
     resetErrors();
     if (!loginEmail) {  
-      setLoginError('Please enter your email.');
+      setLoginError(TEXT.enterEmail);
       return;
     }
     try {
@@ -155,10 +160,10 @@ export default function Auth() {
       if (error) {
         setLoginError(error.message);
       } else {
-        setLoginInfo('A password reset email has been sent.');
+        setLoginInfo(TEXT.emailSendedLoginWithoutPassword);
       }
     } catch (err) {
-      setLoginError('An error occurred while sending the reset email.');
+      setLoginError(TEXT.emailSenededLoginWithoutPasswordError);
     }
   }, [loginEmail]);
 
@@ -188,6 +193,7 @@ export default function Auth() {
     if (redirect) {
       setRedirectTo(redirect);
     }
+    init();
   }, [router]);
 
   return (

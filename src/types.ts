@@ -16,4 +16,7 @@ export type Video = {
   created_at: string
   duration?: string
   thumbnail: string | null
+  is_verified?: boolean | null
+  is_refused?: boolean | null
+  refusal_reason?: string | null
 }

@@ -105,6 +105,7 @@ const VideoList: FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
               </header>
 
               <footer className={styles.videoFooter}>
+                
                 <ThemeTags themes={themes} />
                 <ActionButtons video={v} onEdit={onEdit} onDelete={onDelete} />
               </footer>
