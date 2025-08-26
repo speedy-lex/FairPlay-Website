@@ -122,9 +122,11 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
       const { data, error } = await supabase
         .from('settings')
         .select('bool_value')
-        .eq('Name', 'is_uploading_enable')
+        .eq('name', 'is_uploading_enable')
         .single();
       
+      console.log('data.bool_value:', data?.bool_value, typeof data?.bool_value);
+
       if (data?.bool_value == true) {
         setisuploadingenable(true);
       }
@@ -221,7 +223,6 @@ const VideoUploadModal: FC<VideoUploadModalProps> = ({
         toastInfo('La publication est désactivée pour le moment.');
         return;
       }
-      
       
       setIsUploading(true);
       try {
