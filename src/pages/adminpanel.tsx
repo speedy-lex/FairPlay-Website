@@ -187,7 +187,29 @@ const Thumbnail: FC<{ title: string; thumbnail?: string | null }> = memo(({ titl
                     </label>
                     </div>
 
-                    
+                    <div className={"mainContente"} style={{marginTop: 40}}>
+                        {videos.map((v) => {
+                            const themes = safeParseThemes((v as any).themes);
+                            return (
+                            <article key={v.id} className={"videoCard"} aria-label={`${'Vidéo :'} ${v.title}`}>
+                                <Thumbnail title={v.title} thumbnail={(v as any).thumbnail ?? null} />
+                                <div className={"videoContent"}>
+                                <header className={"videoHeader"}>
+                                    <h4 className={"videoTitle"}>{v.title}</h4>
+                                    {v.description && <p className={"videoDescription"}>{v.description}</p>}
+                                
+                                </header>
+
+                                <footer className={"videoFooter"}>
+                                    
+                                    <ThemeTags themes={themes} />
+                                    
+                                </footer>
+                                </div>
+                            </article>
+                            );
+                        })}
+                        </div>
 
                     </div>
                 </div>
