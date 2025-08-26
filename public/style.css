@@ -1033,3 +1033,117 @@ section h2 {
 .tag:hover {
     background-color: #d0d0d0;
 }
+
+/* --- Section Top Donators --- */
+.section-top-donators {
+    background-color: var(--color-light-gray);
+    padding: 60px 40px;
+    border-radius: 15px;
+    margin-bottom: 80px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.section-top-donators .intro-card {
+    max-width: 1200px;
+}
+
+.donators-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.donator-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-light-gray);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    width: 350px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.donator-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.donator-pfp {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-accent);
+    margin-bottom: 15px;
+}
+
+.donator-rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.donator-rank i {
+    font-size: 28px;
+    margin-right: 10px;
+}
+
+.donator-rank .gold { color: #FFD700; }
+.donator-rank .silver { color: #C0C0C0; }
+.donator-rank .bronze { color: #CD7F32; }
+
+.donator-rank h3 {
+    font-size: 22px;
+    margin: 0;
+}
+
+.donation-amount,
+.donation-count {
+    font-size: 16px;
+    color: var(--color-medium-gray);
+    margin-bottom: 5px;
+}
+
+.donation-amount strong {
+    color: var(--color-dark-gray);
+}
+
+.last-message {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--color-light-gray);
+    text-align: center;
+    width: 100%;
+}
+
+.message-label {
+    font-size: 14px;
+    color: var(--color-text-light);
+    margin-bottom: 5px;
+}
+
+.message-text {
+    font-size: 16px;
+    font-style: italic;
+    color: var(--color-medium-gray);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .donators-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .donator-card {
+        width: 100%;
+        max-width: 350px;
+    }
+}
