@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '@/lib/supabase'
 import type { Video } from '@/types'
-import { Topbar } from '@/components/Topbar'
-import { Sidebar } from '@/components/Sidebar'
+import { Topbar } from '@/components/ui/Topbar/Topbar'
+import { Sidebar } from '@/components/ui/Sidebar/Sidebar'
 import styles from './VideoDetailPage.module.css'
 
 export default function VideoDetailPage() {
@@ -87,7 +87,6 @@ export default function VideoDetailPage() {
                   <iframe
                     className={styles.videoPlayer}
                     src={`https://www.youtube.com/embed/${video.youtube_id}`}
-                    frameBorder="0"
                     allowFullScreen
                   />
                 ) : (
@@ -132,7 +131,7 @@ export default function VideoDetailPage() {
                   className={styles.toggleDescription}
                   onClick={() => setDescriptionExpanded(prev => !prev)}
                 >
-                  {descriptionExpanded ? 'Afficher moins' : 'Afficher plus'}
+                  {descriptionExpanded ? 'Show less' : 'Show more'}
                 </button>
               </>
             )}

@@ -4,11 +4,14 @@ import { parseThemes } from '@/lib/utils';
 import styles from './MyChannel.module.css';
 
 const TEXT = {
-  noVideos: 'Aucune vidéo à afficher.',
-  edit: 'Modifier',
-  delete: 'Supprimer',
-  noThumbnail: 'Pas de miniature',
-  videoLabelPrefix: 'Vidéo :',
+  noVideos: 'No videos',
+  edit: 'Edit',
+  delete: 'Delete',
+  noThumbnail: 'No thumbnail',
+  videoLabelPrefix: 'Video:',
+  waitingForVerification: 'Waiting for verification',
+  verified : 'Verified',
+  refused : 'Refused',
 };
 
 interface VideoListProps {
@@ -90,6 +93,15 @@ const VideoList: FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
               <header className={styles.videoHeader}>
                 <h4 className={styles.videoTitle}>{v.title}</h4>
                 {v.description && <p className={styles.videoDescription}>{v.description}</p>}
+                {v.is_verified && <p style={{color: 'green'}}>{TEXT.verified}</p>}
+                {v.is_refused ? (
+                  <div className="refused-message">
+                  <p style={{color: 'red'}}>{TEXT.refused}</p>
+                  <p style={{color: 'red'}}>{v.refusal_reason}</p>
+                  </div>
+                ) 
+                : 
+                !v.is_verified ? <p style={{color: '#caa603ff'}}>{TEXT.waitingForVerification}</p> : null}
               </header>
 
               <footer className={styles.videoFooter}>

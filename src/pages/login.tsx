@@ -2,7 +2,7 @@ import React, { useState, useCallback, FormEvent, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { supabase } from '@/lib/supabase';
-import { Topbar } from '@/components/Topbar';
+import { Topbar } from '@/components/ui/Topbar/Topbar';
 import styles from './login.module.css';
 import Link from 'next/link';
 import { redirect } from 'next/dist/server/api-utils';
@@ -23,6 +23,16 @@ const TEXT = {
     'A confirmation email has been sent. Please check your inbox.',
   pageTitle: 'Login - FairPlay',
   loginWithoutPassword: 'Login without Password',
+  logindisabled: 'Login is currently disabled.',
+  registerdisabled: 'Registration is currently disabled.',
+  loginerror: 'An error occurred during login.',
+  registerError: 'An error occurred during registration.',
+  enterEmail: 'Please enter a valid email address.',
+  enterPassword: 'Please enter your password.',
+  emailSendedLoginWithoutPassword: 'A login email has been sent to your address.',
+  emailSenededLoginWithoutPasswordError: 'A login email has been sent to your address.',
+  welcome : 'Welcome !',
+  welcomeMessage : 'Access high-quality videos',
 };
 
 type Tab = 'login' | 'register';
@@ -45,6 +55,9 @@ export default function Auth() {
   const [registerMessage, setRegisterMessage] = useState('');
   const [registerLoading, setRegisterLoading] = useState(false);
   const [redirectTo, setRedirectTo] = useState('/feed');
+  const [isLogInAutorised, setisLogInAutorised] = useState(false);
+  const [isSigningInAutorised, setIsSigningInAutorised] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const resetErrors = useCallback(() => {
     setLoginError('');
@@ -69,7 +82,7 @@ export default function Auth() {
           await router.push(redirectTo);
         }
       } catch {
-        setLoginError('Une erreur est survenue lors de la connexion.');
+        setLoginError(TEXT.loginerror);
       } finally {
         setLoginLoading(false);
       }
@@ -82,6 +95,10 @@ export default function Auth() {
       resetErrors();
       e.preventDefault();
       if (registerLoading) return;
+      if (!isSigningInAutorised) {
+        setRegisterError(TEXT.registerdisabled);
+        return;
+      }
       setRegisterError('');
       setRegisterMessage('');
 
@@ -123,6 +140,7 @@ export default function Auth() {
     },
     [registerEmail, registerPassword, registerConfirmPassword, registerUsername, registerLoading]
   );
+
   const handleForgotPassword = useCallback(async () => {
     resetErrors();
     if (!loginEmail) {  
@@ -144,12 +162,29 @@ export default function Auth() {
     }
   }, [loginEmail]);
 
+  const fetchSettingEnabled = async (setting : string) => {
+    const { data, error } = await supabase
+    .from('settings')
+    .select('bool_value')
+    .eq('name', setting)
+    .single();
+
+    if (error) console.error(error.message);
+    return(!!data?.bool_value);
+    };
+
+  const init = async () => {
+    setisLogInAutorised(await fetchSettingEnabled('isLogInAutorised'));
+    setIsSigningInAutorised(await fetchSettingEnabled('isSigningInAutorised'));
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) router.replace('/');
     });
     const params = new URLSearchParams(window.location.search);
     const redirect= params.get('redirect');
+    init();
     if (redirect) {
       setRedirectTo(redirect);
     }

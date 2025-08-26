@@ -1,9 +1,9 @@
 "use client"
 
 import Head from 'next/head';
-import { Topbar } from '@/components/Topbar'
-import { Sidebar } from '@/components/Sidebar'
-import { NotImplementedSection } from '@/components/props/notImplementedSection'
+import { Topbar } from '@/components/ui/Topbar/Topbar'
+import { Sidebar } from '@/components/ui/Sidebar/Sidebar'
+import { NotImplementedSection } from '@/components/ui/NotImplemented/notImplementedSection'
 
 export default function SubscriptionsPage() {
   return (

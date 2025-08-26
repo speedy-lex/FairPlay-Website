@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Video } from '@/types';
 import { supabase } from '@/lib/supabase';
-import { CategoryFilter } from './CategoryFilter';
+import { CategoryFilter } from '../CategoryFilter/CategoryFilter';
 
 interface VideoGridSectionProps {
   loading: boolean;

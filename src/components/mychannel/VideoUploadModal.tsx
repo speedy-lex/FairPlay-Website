@@ -11,8 +11,8 @@ import {
 import { supabase } from '@/lib/supabase';
 import { getNativeVideoDuration, secondsToISODuration } from '@/utils/videoHelpers';
 import { Video } from '@/types';
-import { XIcon } from '@/components/props/icons';
-import { useToast } from '@/components/props/Toast';
+import { XIcon } from '@/components/icons';
+import { useToast } from '@/components/ui/Toast/Toast';
 import styles from './MyChannel.module.css';
 
 interface VideoUploadModalProps {

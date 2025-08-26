@@ -2,7 +2,7 @@ import React, { useState, useCallback, FormEvent, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { supabase } from '@/lib/supabase';
-import { Topbar } from '@/components/Topbar';
+import { Topbar } from '@/components/ui/Topbar/Topbar';
 import styles from './login.module.css';
 import { type EmailOtpType } from '@supabase/supabase-js'
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRightIcon } from '@/components/props/icons';
+import { ChevronRightIcon } from '@/components/icons';
 
 interface CategoryFilterProps {
   categories: string[];
