@@ -13,6 +13,7 @@ import {
   faGamepad,
   faGlobe
 } from '@fortawesome/free-solid-svg-icons'
+import styles from './Sidebar.module.css';
 
 type Props = {
   active: string
@@ -37,38 +38,38 @@ export const Sidebar: React.FC<Props> = ({ active }) => {
   }, [getSessionUser]);
 
   return (
-    <aside className="sidebar">
-      <nav className="sidebar-nav">
+    <aside className={styles.sidebar}>
+      <nav className={styles.sidebarNav}>
         <ul>
           <li>
-            <Link href="/feed" className={active === 'videos' ? 'active' : ''}>
-              <FontAwesomeIcon icon={faCompass} className="sidebarIcon" /> Explore
+            <Link href="/feed" className={active === 'videos' ? styles.active : ''}>
+              <FontAwesomeIcon icon={faCompass} className={styles.sidebarIcon} /> Explore
             </Link>
           </li>
           <li>
-            <Link href="/offline" className={active === 'offline' ? 'active' : ''}>
-              <FontAwesomeIcon icon={faGlobe} className="sidebarIcon" /> Offline
+            <Link href="/offline" className={active === 'offline' ? styles.active : ''}>
+              <FontAwesomeIcon icon={faGlobe} className={styles.sidebarIcon} /> Offline
             </Link>
           </li>
           <li>
-            <Link href="/subscriptions" className={active === 'subscriptions' ? 'active' : ''}>
-              <FontAwesomeIcon icon={faBell} className="sidebarIcon" /> Subscriptions
+            <Link href="/subscriptions" className={active === 'subscriptions' ? styles.active : ''}>
+              <FontAwesomeIcon icon={faBell} className={styles.sidebarIcon} /> Subscriptions
             </Link>
           </li>
           <li>
-            <Link href="/history" className={active === 'history' ? 'active' : ''}>
-              <FontAwesomeIcon icon={faHistory} className="sidebarIcon" /> History
+            <Link href="/history" className={active === 'history' ? styles.active : ''}>
+              <FontAwesomeIcon icon={faHistory} className={styles.sidebarIcon} /> History
             </Link>
           </li>
           {isLoggedIn && (
             <li>
-              <Link href="/mychannel" className={active === 'channel' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faUserCircle} className="sidebarIcon" /> My Channel
+              <Link href="/mychannel" className={active === 'channel' ? styles.active : ''}>
+                <FontAwesomeIcon icon={faUserCircle} className={styles.sidebarIcon} /> My Channel
               </Link>
             </li>
           )}
         </ul>
-        {isLoggedIn && (<div className="sidebar-section">
+        {isLoggedIn && (<div className={styles.sidebarSection}>
           <h4>Subscriptions</h4>
           <ul>
             <li>
@@ -89,22 +90,22 @@ export const Sidebar: React.FC<Props> = ({ active }) => {
           </ul>
         </div>
         )}
-        <div className="sidebar-section">
+        <div className={styles.sidebarSection}>
           <h4>More of FairPlay</h4>
           <ul>
             <li>
-              <Link href="/trending" className={active === 'popular' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faAward} className="sidebarIcon" /> Trending
+              <Link href="/trending" className={active === 'popular' ? styles.active : ''}>
+                <FontAwesomeIcon icon={faAward} className={styles.sidebarIcon} /> Trending
               </Link>
             </li>
             <li>
-              <Link href="/learning" className={active === 'learning' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faBookOpen} className="sidebarIcon" /> Learning
+              <Link href="/learning" className={active === 'learning' ? styles.active : ''}>
+                <FontAwesomeIcon icon={faBookOpen} className={styles.sidebarIcon} /> Learning
               </Link>
             </li>
             <li>
-              <Link href="/gaming" className={active === 'gaming' ? 'active' : ''}>
-                <FontAwesomeIcon icon={faGamepad} className="sidebarIcon" /> Gaming
+              <Link href="/gaming" className={active === 'gaming' ? styles.active : ''}>
+                <FontAwesomeIcon icon={faGamepad} className={styles.sidebarIcon} /> Gaming
               </Link>
             </li>
           </ul>

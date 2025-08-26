@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { Topbar } from '@/components/ui/Topbar/Topbar';
 import { Sidebar } from '@/components/ui/Sidebar/Sidebar';
 import { NotImplementedSection } from '@/components/ui/NotImplemented/notImplementedSection';
+import styles from './gaming.module.css'; // not used for now
 
 export default function GamingPage() {
   return (

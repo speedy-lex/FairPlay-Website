@@ -1,5 +1,7 @@
+"use client"
+
 import { useEffect, useState, ChangeEvent, useCallback, useMemo, useRef } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import { supabase } from '@/lib/supabase';
 import VideoUploadModal from '@/components/mychannel/VideoUploadModal';
@@ -7,7 +9,7 @@ import VideoList from '@/components/mychannel/VideoList';
 import { parseThemes } from '@/lib/utils';
 import { Video } from '@/types';
 import { ToastProvider, useToast } from '@/components/ui/Toast/Toast';
-import styles from '../components/mychannel/MyChannel.module.css';
+import styles from './mychannel.module.css';
 import { Topbar } from '@/components/ui/Topbar/Topbar'
 import { Sidebar } from '@/components/ui/Sidebar/Sidebar'
 

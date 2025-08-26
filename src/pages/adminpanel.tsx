@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Topbar } from "@/components/ui/Topbar/Topbar";
 import { Sidebar } from "@/components/ui/Sidebar/Sidebar";
 import { ToastProvider, useToast } from "@/components/ui/Toast/Toast";
+import styles from './adminpanel.module.css'; // not used for now
 
 export default function AdminPanel() {
   const { error: toastError } = useToast();
@@ -100,10 +101,9 @@ export default function AdminPanel() {
         <main className="main-content">
           {isAdmin ? (
             <div>
-              Welcome to the Admin Panel
-              <div style={{ marginTop: 20 }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <h1 className={styles.settingsTitle}>Welcome to the Admin Panel</h1>
+              <div className={styles.settingsContainer}>
+                  <label className={styles.settingsLabel}>
                     <input
                       type="checkbox"
                       checked={is_uploading_enable}
@@ -114,7 +114,7 @@ export default function AdminPanel() {
                     <span>Is uploading enabled</span>
                   </label>
 
-                  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <label className={styles.settingsLabel}>
                     <input
                       type="checkbox"
                       checked={isLogInAutorised}
@@ -125,7 +125,7 @@ export default function AdminPanel() {
                     <span>Is login authorized</span>
                   </label>
 
-                  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <label className={styles.settingsLabel}>
                     <input
                       type="checkbox"
                       checked={isSigningInAutorised}
@@ -135,55 +135,13 @@ export default function AdminPanel() {
                     />
                     <span>Is sign-in authorized</span>
                   </label>
-                </div>
               </div>
             </div>
           ) : (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                background: "#fff",
-                borderRadius: 16,
-                boxShadow: "0 4px 24px rgba(106,142,251,0.08)",
-                padding: "2rem 2.5rem",
-                marginTop: 40,
-                maxWidth: 400,
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "1.2rem",
-                  color: "#6A8EFB",
-                  marginBottom: 12,
-                  textAlign: "center",
-                }}
-              >
-                You do not have access to this page.
-              </div>
+            <div className={styles.errorContainer}>
+              <div className={styles.errorTitle}>You do not have access to this page.</div>
               {!isloggedin && (
-                <Link
-                  href="/login?redirect=/adminpanel"
-                  className="login-button"
-                  style={{
-                    marginTop: 16,
-                    background: "white",
-                    color: "black",
-                    padding: "0.2rem 1rem",
-                    borderRadius: 5,
-                    fontWeight: 600,
-                    textDecoration: "none",
-                    fontFamily: "'Montserrat', sans-serif",
-                    transition: "background 0.2s",
-                  }}
-                >
-                  Login
-                </Link>
+                <Link href="/login?redirect=/adminpanel" className={styles.loginButton}>Login</Link>
               )}
             </div>
           )}
