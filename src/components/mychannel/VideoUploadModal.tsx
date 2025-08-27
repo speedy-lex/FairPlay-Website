@@ -13,7 +13,7 @@ import { getNativeVideoDuration, secondsToISODuration } from '@/utils/videoHelpe
 import { Video } from '@/types';
 import { XIcon } from '@/components/icons';
 import { useToast } from '@/components/ui/Toast/Toast';
-import styles from './MyChannel.module.css';
+import styles from '../../pages/mychannel.module.css';
 
 interface VideoUploadModalProps {
   open: boolean;

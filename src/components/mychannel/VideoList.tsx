@@ -1,7 +1,7 @@
 import React, { FC, memo, useCallback } from 'react';
 import { Video } from '@/types';
 import { parseThemes } from '@/lib/utils';
-import styles from './MyChannel.module.css';
+import styles from '../../pages/mychannel.module.css';
 
 const TEXT = {
   noVideos: 'No videos',

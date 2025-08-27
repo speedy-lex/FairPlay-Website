@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '@/lib/supabase';
+import styles from './Topbar.module.css';
 
 export const Topbar: React.FC = () => {
   const [isAuthed, setIsAuthed] = useState<boolean>(false);
@@ -34,26 +35,26 @@ export const Topbar: React.FC = () => {
   return (
     <header className="main-header">
       <div className="container">
-        <h1 className="logo">
+        <h1 className={styles.logo}>
           <a href="/">FairPlay</a>
         </h1>
 
-        <div className="search-bar">
+        <div className={styles.searchBar}>
           <input type="text" placeholder="Search videos..." />
           <button type="submit" aria-label="Search">
             <FontAwesomeIcon icon={faSearch} />
           </button>
         </div>
 
-        <div className="header-actions">
+        <div className={styles.headerActions}>
           {!isAuthed && (
-            <a href="/login" className="login-button">Login</a>
+            <a href="/login" className={styles.loginButton}>Login</a>
           )}
           {isAuthed && (
-            <button type="button" className="login-button" onClick={handleLogout}>Log Out</button>
+            <button type="button" className={styles.loginButton} onClick={handleLogout}>Log Out</button>
           )}
           <button
-            className="donate-button"
+            className={styles.donateButton}
             onClick={() => window.open("https://ko-fi.com/fairplay_", "_blank")}
           >
             Donate

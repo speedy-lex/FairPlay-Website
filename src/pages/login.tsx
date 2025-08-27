@@ -4,8 +4,7 @@ import { useRouter } from 'next/router';
 import { supabase } from '@/lib/supabase';
 import { Topbar } from '@/components/ui/Topbar/Topbar';
 import styles from './login.module.css';
-import Link from 'next/link';
-import { redirect } from 'next/dist/server/api-utils';
+
 
 const TEXT = {
   title: 'Authentification',
@@ -242,7 +241,7 @@ export default function Auth() {
                     required
                   />
                 </label>
-                <span className='loginWithoutPasswordButton' onClick={handleForgotPassword}>{TEXT.loginWithoutPassword}</span>
+                <span className={styles.loginWithoutPasswordButton} onClick={handleForgotPassword}>{TEXT.loginWithoutPassword}</span>
                 {loginInfo && <p className={styles.info}>{loginInfo}</p>}
                 {loginError && <p className={styles.error}>{loginError}</p>}
                 <button type="submit" disabled={loginLoading}>
