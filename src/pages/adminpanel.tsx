@@ -136,6 +136,29 @@ export default function AdminPanel() {
                     <span>Is sign-in authorized</span>
                   </label>
                 </div>
+                <div className={"mainContente"} style={{marginTop: 40}}>
+                        {videos.map((v) => {
+                            
+                            return (
+                            <article key={v.id} className={"videoCard"} aria-label={`${'Vidéo :'} ${v.title}`}>
+                                
+                                <div className={"videoContent"}>
+                                <header className={"videoHeader"}>
+                                    <h4 className={"videoTitle"}>{v.title}</h4>
+                                    {v.description && <p className={"videoDescription"}>{v.description}</p>}
+                                
+                                </header>
+
+                                <footer className={"videoFooter"}>
+                                    
+                                    
+                                    
+                                </footer>
+                                </div>
+                            </article>
+                            );
+                        })}
+                        </div>
               </div>
             </div>
           ) : (
