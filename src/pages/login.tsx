@@ -99,10 +99,10 @@ export default function Auth() {
       resetErrors();
       e.preventDefault();
       if (registerLoading) return;
-      if (!isSigningInAutorised) {
+      /*if (!isSigningInAutorised) {
         setRegisterError(TEXT.registerdisabled);
         return;
-      }
+      }*/
       setRegisterError('');
       setRegisterMessage('');
 

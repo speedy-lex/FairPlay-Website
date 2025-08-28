@@ -11,66 +11,62 @@ import { Video } from "@/types";
 export default function AdminPanel() {
   const { error: toastError } = useToast();
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isModerator, setisModerator] = useState(false);
   const [isloggedin, setIsloggedin] = useState(false);
   const [loading, setLoading] = useState(true);
+  
+  const [videos, setVideos] = useState<any[]>([]);
+  const [userId, setuser] = useState("");
 
-  const [isLogInAutorised, setisLogInAutorised] = useState(false);
-  const [isSigningInAutorised, setIsSigningInAutorised] = useState(true);
-  const [is_uploading_enable, setisis_uploading_enable] = useState(true);
-
-
-  const fetchAdminStatus = useCallback(async () => {
+  const fetchModeratorStatus = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setIsloggedin(true);
       const { data: profile } = await supabase
         .from("profiles")
-        .select("is_admin")
+        .select("is_moderator")
         .eq("id", user.id)
         .single();
-      setIsAdmin(profile?.is_admin ?? false);
+      setisModerator(profile?.is_moderator ?? false);
       //setuser(user?.id);
     }
   }, []);
 
-  const fetchFeatureEnabled = useCallback(async (setting: string) => {
+  const fetchVideos = useCallback(async () => {
     const { data, error } = await supabase
-      .from("settings")
-      .select("bool_value")
-      .eq("name", setting)
-      .single();
-    if (error) toastError?.(error.message);
-    return !!data?.bool_value;
-  }, [toastError]);
-
-  const handleToggle = useCallback(async (setting: string, actualValue: boolean) => {
-    const newValue = !actualValue;
-    const { error } = await supabase
-      .from("settings")
-      .update({ bool_value: newValue })
-      .eq("name", setting);
+      .from("videos")
+      .select("*")
+      .eq("is_verified", false)
+      .eq("is_refused", false)
+      .order("created_at", { ascending: true });
     if (error) {
-      toastError?.("Update failed: " + error.message);
-      return actualValue;
+      toastError?.("Error fetching videos: " + error.message);
+      return [];
     }
-    return newValue;
+    return data || [];
   }, [toastError]);
 
-
-
+  const fetchusersession = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
+    if (user?.id) {
+      setuser(user.id);
+      console.log("user", user.id);
+    } else {
+      toastError("User ID is undefined");
+    }
+  }, [supabase.auth]);
 
   useEffect(() => {
     (async () => {
-      await fetchAdminStatus();
-      if (isAdmin) {non
-        setisis_uploading_enable(await fetchFeatureEnabled("is_uploading_enable"));
-        setisLogInAutorised(await fetchFeatureEnabled("isLogInAutorised"));
-        setIsSigningInAutorised(await fetchFeatureEnabled("isSigningInAutorised"));
+      await fetchModeratorStatus();
+      if (isModerator) {
+        await fetchusersession();
+        setVideos(await fetchVideos());
       }
       setLoading(false);
     })();
-  }, [isAdmin, fetchAdminStatus, fetchVideos, fetchFeatureEnabled]);
+  }, [isModerator, fetchModeratorStatus, fetchVideos]);
 
  const updateVideo = useCallback(async (video: Video) => {
     const { error } = await supabase 
@@ -148,43 +144,9 @@ export default function AdminPanel() {
       <div className="page-wrapper container">
         <Sidebar active="channel" />
         <main className="main-content">
-          {isAdmin ? (
+          {isModerator ? (
             <div>
               <h1 className={styles.settingsTitle}>Welcome to the Admin Panel</h1>
-              <div className={styles.settingsContainer}>
-                  <label className={styles.settingsLabel}>
-                    <input
-                      type="checkbox"
-                      checked={is_uploading_enable}
-                      onChange={async () =>
-                        setisis_uploading_enable(await handleToggle("is_uploading_enable", is_uploading_enable))
-                      }
-                    />
-                    <span>Is uploading enabled</span>
-                  </label>
-
-                  <label className={styles.settingsLabel}>
-                    <input
-                      type="checkbox"
-                      checked={isLogInAutorised}
-                      onChange={async () =>
-                        setisLogInAutorised(await handleToggle("isLogInAutorised", isLogInAutorised))
-                      }
-                    />
-                    <span>Is login authorized</span>
-                  </label>
-
-                  <label className={styles.settingsLabel}>
-                    <input
-                      type="checkbox"
-                      checked={isSigningInAutorised}
-                      onChange={async () =>
-                        setIsSigningInAutorised(await handleToggle("isSigningInAutorised", isSigningInAutorised))
-                      }
-                    />
-                    <span>Is sign-in authorized</span>
-                  </label>
-                </div>
                 <div className={"mainContente"} style={{marginTop: 40}}>
                   <VideoList videos={videos} onButton1={handleAprove} onButton2={handleRefuse} button1Text="✅ Aprove" button2Text="❌ Refuse" />
                         </div>

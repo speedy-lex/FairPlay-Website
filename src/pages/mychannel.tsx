@@ -47,7 +47,10 @@ const TEXT = {
   },
   defaultAvatar: '/default-avatar.png',
   adminpanelbutton: 'Admin Panel',
-  delete: 'Delete'
+  delete: 'Delete',
+  admin : 'Administrator',
+  moderator : 'Moderator',
+  moderationpanelbutton : 'Moderation Panel',
 };
 
 function MyChannelInner() {
@@ -76,6 +79,7 @@ function MyChannelInner() {
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [initialFile, setInitialFile] = useState<File | null>(null);
   const [is_admin, setIs_admin] = useState(false);
+  const [is_moderator, setIs_moderator] = useState(false);
 
   // === Utils ===
   const getSessionUser = useCallback(async () => {
@@ -100,7 +104,7 @@ function MyChannelInner() {
 
     const { data: profileData, error } = await supabase
       .from('profiles')
-      .select('username, avatar_url, is_admin')
+      .select('username, avatar_url, is_admin, is_moderator')
       .eq('id', user.id)
       .single();
 
@@ -111,6 +115,9 @@ function MyChannelInner() {
     }
     if (profileData.is_admin) {
       setIs_admin(true);
+    }
+    if (profileData.is_moderator) {
+      setIs_moderator(true);
     }
     setProfile({ username: profileData.username, avatar_url: profileData.avatar_url });
     setEditUsername(profileData.username || '');
@@ -339,7 +346,8 @@ function MyChannelInner() {
                   <div>
                     <h2>{profile.username}</h2>
                     <p>{editHandle}</p>
-                    {is_admin && <div className={styles.adminBadge}>Administrateur</div>}
+                    {is_admin && <div className={styles.adminBadge}>{TEXT.admin}</div>}
+                    {is_moderator && <div className={styles.moderatorBadge}>{TEXT.moderator}</div>}
                   </div>
                 </div>
 
@@ -441,6 +449,7 @@ function MyChannelInner() {
 
                 <div className={styles.actions}>
                   {is_admin && <button type="button" onClick={() => router.push("/adminpanel")}>{TEXT.adminpanelbutton}</button>}
+                  {is_moderator && <button type="button" onClick={() => router.push("/moderation-panel")}>{TEXT.moderationpanelbutton}</button>}
                   <button type="button" onClick={handleLogout}>{TEXT.logout}</button>
                 </div>
               </div>
