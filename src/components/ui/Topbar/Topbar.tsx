@@ -48,7 +48,10 @@ export const Topbar: React.FC = () => {
 
         <div className={styles.headerActions}>
           {!isAuthed && (
+            <>
             <a href="/login" className={styles.loginButton}>Login</a>
+            <a href="/login?register=true" className={styles.loginButton}>SignUp</a>
+            </>
           )}
           {isAuthed && (
             <button type="button" className={styles.loginButton} onClick={handleLogout}>Log Out</button>

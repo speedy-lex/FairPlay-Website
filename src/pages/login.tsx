@@ -188,11 +188,15 @@ export default function Auth() {
     });
     const params = new URLSearchParams(window.location.search);
     const redirect= params.get('redirect');
-    init();
+    const register= params.get('register');
+    if (register === 'true') {  
+      setActiveTab('register');
+    }
     if (redirect) {
       setRedirectTo(redirect);
     }
     init();
+    
   }, [router]);
 
   return (
