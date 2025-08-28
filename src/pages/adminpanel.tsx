@@ -63,14 +63,14 @@ export default function AdminPanel() {
   useEffect(() => {
     (async () => {
       await fetchAdminStatus();
-      if (isAdmin) {non
+      if (isAdmin) {
         setisis_uploading_enable(await fetchFeatureEnabled("is_uploading_enable"));
         setisLogInAutorised(await fetchFeatureEnabled("isLogInAutorised"));
         setIsSigningInAutorised(await fetchFeatureEnabled("isSigningInAutorised"));
       }
       setLoading(false);
     })();
-  }, [isAdmin, fetchAdminStatus, fetchVideos, fetchFeatureEnabled]);
+  }, [isAdmin, fetchAdminStatus, fetchFeatureEnabled]);
 
  const updateVideo = useCallback(async (video: Video) => {
     const { error } = await supabase 
@@ -91,42 +91,8 @@ export default function AdminPanel() {
 
   }, [toastError]);
 
-  const handleAprove = useCallback(async (video: Video) => {
-    if (userId === video.refusedOnce_user_id) {
-      video.refusedOnce_user_id = null;
-      video.refusedOnce = false;
-    }
-    if (!video.verifiedOnce) {
-      video.verifiedOnce = true;
-      video.verifiedOnce_user_id = userId
+  
 
-    }
-    if (video.verifiedOnce && !video.is_refused && userId !== video.verifiedOnce_user_id) {
-      video.is_verified = true;
-    }
-    console.log(video);
-    console.log("userid", userId);
-    await updateVideo(video);
-  }, []);
-
-  const handleRefuse = useCallback(async (video: Video) => {
-    if (userId === video.verifiedOnce_user_id) {
-      video.verifiedOnce_user_id = null;
-      video.verifiedOnce = false;
-    }
-    if (!video.refusedOnce) {
-      video.refusedOnce = true;
-      video.refusedOnce_user_id = userId
-  } 
-    if (video.refusedOnce && !video.verifiedOnce && userId !== video.refusedOnce_user_id) {
-      video.is_refused = true;
-    }
-    if (video.refusedOnce && video.verifiedOnce && userId !== video.refusedOnce_user_id && userId !== video.verifiedOnce_user_id) {
-      video.is_refused = true;
-    }
-    await updateVideo(video);
-
-}, []);
 
   if (loading) {
     return (
@@ -185,10 +151,7 @@ export default function AdminPanel() {
                     <span>Is sign-in authorized</span>
                   </label>
                 </div>
-                <div className={"mainContente"} style={{marginTop: 40}}>
-                  <VideoList videos={videos} onButton1={handleAprove} onButton2={handleRefuse} button1Text="✅ Aprove" button2Text="❌ Refuse" />
-                        </div>
-              </div>
+            </div>
             
           ) : (
             <div className={styles.errorContainer}>
