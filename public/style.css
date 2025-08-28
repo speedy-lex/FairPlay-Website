@@ -305,7 +305,7 @@ section h2 {
 .hero-image img {
   max-width: 100%;
   height: auto;
-  border-radius: 15px;
+  border-radius: 15px 0px 0px 15px;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
   backface-visibility: hidden;
   transform-origin: center center;
