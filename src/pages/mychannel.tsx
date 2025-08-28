@@ -47,6 +47,7 @@ const TEXT = {
   },
   defaultAvatar: '/default-avatar.png',
   adminpanelbutton: 'Admin Panel',
+  delete: 'Delete'
 };
 
 function MyChannelInner() {
@@ -379,7 +380,7 @@ function MyChannelInner() {
                     ) : videos.length === 0 ? (
                       <p>{TEXT.noVideos}</p>
                     ) : (
-                      <VideoList videos={videos} onEdit={openEditVideoModal} onDelete={handleDeleteVideo} />
+                      <VideoList videos={videos} onButton1={openEditVideoModal} onButton2={handleDeleteVideo} button1Text={TEXT.edit} button2Text={TEXT.delete} />
                     )}
                   </section>
                 )}

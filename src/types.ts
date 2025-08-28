@@ -19,4 +19,8 @@ export type Video = {
   is_verified?: boolean | null
   is_refused?: boolean | null
   refusal_reason?: string | null
+  verifiedOnce?: boolean | null
+  refusedOnce?: boolean | null
+  verifiedOnce_user_id?: string | null
+  refusedOnce_user_id?: string | null
 }

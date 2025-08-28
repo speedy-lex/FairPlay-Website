@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Topbar } from "@/components/ui/Topbar/Topbar";
 import { Sidebar } from "@/components/ui/Sidebar/Sidebar";
 import { ToastProvider, useToast } from "@/components/ui/Toast/Toast";
-import styles from './adminpanel.module.css'; // not used for now
+import styles from './adminpanel.module.css';
+import VideoList from "@/components/mychannel/VideoList";
+import { Video } from "@/types";
 
 export default function AdminPanel() {
   const { error: toastError } = useToast();
@@ -17,6 +19,7 @@ export default function AdminPanel() {
   const [isSigningInAutorised, setIsSigningInAutorised] = useState(true);
   const [is_uploading_enable, setisis_uploading_enable] = useState(true);
   const [videos, setVideos] = useState<any[]>([]);
+  const [userId, setuser] = useState("");
 
   const fetchAdminStatus = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -28,6 +31,7 @@ export default function AdminPanel() {
         .eq("id", user.id)
         .single();
       setIsAdmin(profile?.is_admin ?? false);
+      //setuser(user?.id);
     }
   }, []);
 
@@ -49,7 +53,7 @@ export default function AdminPanel() {
       .eq("name", setting);
     if (error) {
       toastError?.("Update failed: " + error.message);
-      return actualValue; // keep the old value in case of failure
+      return actualValue;
     }
     return newValue;
   }, [toastError]);
@@ -58,6 +62,8 @@ export default function AdminPanel() {
     const { data, error } = await supabase
       .from("videos")
       .select("*")
+      .eq("is_verified", false)
+      .eq("is_refused", false)
       .order("created_at", { ascending: true });
     if (error) {
       toastError?.("Error fetching videos: " + error.message);
@@ -66,10 +72,22 @@ export default function AdminPanel() {
     return data || [];
   }, [toastError]);
 
+  const fetchusersession = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
+    if (user?.id) {
+      setuser(user.id);
+      console.log("user", user.id);
+    } else {
+      toastError("User ID is undefined");
+    }
+  }, [supabase.auth]);
+
   useEffect(() => {
     (async () => {
       await fetchAdminStatus();
       if (isAdmin) {
+        await fetchusersession();
         setVideos(await fetchVideos());
         setisis_uploading_enable(await fetchFeatureEnabled("is_uploading_enable"));
         setisLogInAutorised(await fetchFeatureEnabled("isLogInAutorised"));
@@ -78,6 +96,62 @@ export default function AdminPanel() {
       setLoading(false);
     })();
   }, [isAdmin, fetchAdminStatus, fetchVideos, fetchFeatureEnabled]);
+
+ const updateVideo = useCallback(async (video: Video) => {
+    const { error } = await supabase 
+      .from("videos")
+      .update({
+        is_verified: video.is_verified,
+        is_refused: video.is_refused,
+        verifiedOnce: video.verifiedOnce,
+        refusedOnce: video.refusedOnce,
+        verifiedOnce_user_id: video.verifiedOnce_user_id,
+        refusedOnce_user_id: video.refusedOnce_user_id,
+      })
+      .eq("id", video.id);
+    if (error) {
+      toastError?.("Error updating video: " + error.message);
+      return;
+    }
+
+  }, [toastError]);
+
+  const handleAprove = useCallback(async (video: Video) => {
+    if (userId === video.refusedOnce_user_id) {
+      video.refusedOnce_user_id = null;
+      video.refusedOnce = false;
+    }
+    if (!video.verifiedOnce) {
+      video.verifiedOnce = true;
+      video.verifiedOnce_user_id = userId
+
+    }
+    if (video.verifiedOnce && !video.is_refused && userId !== video.verifiedOnce_user_id) {
+      video.is_verified = true;
+    }
+    console.log(video);
+    console.log("userid", userId);
+    await updateVideo(video);
+  }, []);
+
+  const handleRefuse = useCallback(async (video: Video) => {
+    if (userId === video.verifiedOnce_user_id) {
+      video.verifiedOnce_user_id = null;
+      video.verifiedOnce = false;
+    }
+    if (!video.refusedOnce) {
+      video.refusedOnce = true;
+      video.refusedOnce_user_id = userId
+  } 
+    if (video.refusedOnce && !video.verifiedOnce && userId !== video.refusedOnce_user_id) {
+      video.is_refused = true;
+    }
+    if (video.refusedOnce && video.verifiedOnce && userId !== video.refusedOnce_user_id && userId !== video.verifiedOnce_user_id) {
+      video.is_refused = true;
+    }
+    await updateVideo(video);
+
+}, []);
 
   if (loading) {
     return (
@@ -137,27 +211,7 @@ export default function AdminPanel() {
                   </label>
                 </div>
                 <div className={"mainContente"} style={{marginTop: 40}}>
-                        {videos.map((v) => {
-                            
-                            return (
-                            <article key={v.id} className={"videoCard"} aria-label={`${'Vidéo :'} ${v.title}`}>
-                                
-                                <div className={"videoContent"}>
-                                <header className={"videoHeader"}>
-                                    <h4 className={"videoTitle"}>{v.title}</h4>
-                                    {v.description && <p className={"videoDescription"}>{v.description}</p>}
-                                
-                                </header>
-
-                                <footer className={"videoFooter"}>
-                                    
-                                    
-                                    
-                                </footer>
-                                </div>
-                            </article>
-                            );
-                        })}
+                  <VideoList videos={videos} onButton1={handleAprove} onButton2={handleRefuse} button1Text="✅ Aprove" button2Text="❌ Refuse" />
                         </div>
               </div>
             
@@ -174,3 +228,6 @@ export default function AdminPanel() {
     </ToastProvider>
   );
 }
+
+
+

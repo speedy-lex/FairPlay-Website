@@ -1,12 +1,10 @@
-import React, { FC, memo, useCallback } from 'react';
+import React, { FC, memo, useCallback, useState } from 'react';
 import { Video } from '@/types';
 import { parseThemes } from '@/lib/utils';
 import styles from '../../pages/mychannel.module.css';
 
 const TEXT = {
   noVideos: 'No videos',
-  edit: 'Edit',
-  delete: 'Delete',
   noThumbnail: 'No thumbnail',
   videoLabelPrefix: 'Video:',
   waitingForVerification: 'Waiting for verification',
@@ -16,8 +14,11 @@ const TEXT = {
 
 interface VideoListProps {
   videos: Video[];
-  onEdit: (video: Video) => void;
-  onDelete: (video: Video) => void;
+  onButton1: (video: Video) => void;
+  onButton2: (video: Video) => void;
+  button1Text: string;
+  button2Text: string;
+  
 }
 
 function safeParseThemes(raw: unknown): string[] {
@@ -43,18 +44,20 @@ const ThemeTags: FC<{ themes: string[] }> = memo(({ themes }) => {
 
 const ActionButtons: FC<{
   video: Video;
-  onEdit: (v: Video) => void;
-  onDelete: (v: Video) => void;
-}> = ({ video, onEdit, onDelete }) => {
-  const handleEdit = useCallback(() => onEdit(video), [onEdit, video]);
-  const handleDelete = useCallback(() => onDelete(video), [onDelete, video]);
+  onButton1: (v: Video) => void;
+  onButton2: (v: Video) => void;
+  button1Text: string;
+  button2Text: string;
+}> = ({ video, onButton1: onButton1, onButton2: onButton2, button1Text, button2Text }) => {
+  const handleButton1 = useCallback(() => onButton1(video), [onButton1, video]);
+  const handleButton2 = useCallback(() => onButton2(video), [onButton2, video]);
   return (
     <div className={styles.actions}>
-      <button type="button" onClick={handleEdit}>
-        {TEXT.edit}
+      <button type="button" onClick={handleButton1}>
+        {button1Text}
       </button>
-      <button type="button" onClick={handleDelete}>
-        {TEXT.delete}
+      <button type="button" onClick={handleButton2}>
+        {button2Text}
       </button>
     </div>
   );
@@ -77,7 +80,7 @@ const Thumbnail: FC<{ title: string; thumbnail?: string | null }> = memo(({ titl
   );
 });
 
-const VideoList: FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
+const VideoList: FC<VideoListProps> = ({ videos, onButton1: onButton1, onButton2: onButton2 , button1Text : button1Text, button2Text : button2Text}) => {
   if (!videos.length) {
     return <div className={styles.textCenter}>{TEXT.noVideos}</div>;
   }
@@ -107,7 +110,7 @@ const VideoList: FC<VideoListProps> = ({ videos, onEdit, onDelete }) => {
               <footer className={styles.videoFooter}>
                 
                 <ThemeTags themes={themes} />
-                <ActionButtons video={v} onEdit={onEdit} onDelete={onDelete} />
+                <ActionButtons video={v} onButton1={onButton1} onButton2={onButton1} button1Text={button1Text} button2Text={button2Text} />
               </footer>
             </div>
           </article>
