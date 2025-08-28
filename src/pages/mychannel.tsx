@@ -32,7 +32,7 @@ const TEXT = {
   dropzoneIdle: 'Drag and drop a video or click to select one',
   noVideos: 'No videos published.',
   customizeChannel: 'Customize your channel',
-  channelBanner: "Channel Banner",
+  channelBanner: "Channel Banner (click to change)",
   edit: 'Edit',
   profileImage: 'Profile Image',
   channelName: 'Channel Name',
@@ -66,6 +66,7 @@ function MyChannelInner() {
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const avatarObjectUrlRef = useRef<string | null>(null);
+  const bannerObjectUrlRef = useRef<string | null>(null);
 
   // Videos state
   const [videos, setVideos] = useState<Video[]>([]);
@@ -80,6 +81,8 @@ function MyChannelInner() {
   const [initialFile, setInitialFile] = useState<File | null>(null);
   const [is_admin, setIs_admin] = useState(false);
   const [is_moderator, setIs_moderator] = useState(false);
+  const [BannerURL, setBannerURL] = useState<string>("https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière" as any);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
 
   // === Utils ===
   const getSessionUser = useCallback(async () => {
@@ -104,7 +107,7 @@ function MyChannelInner() {
 
     const { data: profileData, error } = await supabase
       .from('profiles')
-      .select('username, avatar_url, is_admin, is_moderator')
+      .select('username, avatar_url, is_admin, is_moderator, bannerURL')
       .eq('id', user.id)
       .single();
 
@@ -118,6 +121,9 @@ function MyChannelInner() {
     }
     if (profileData.is_moderator) {
       setIs_moderator(true);
+    }
+    if (profileData.bannerURL) {
+      setBannerURL(profileData.bannerURL);
     }
     setProfile({ username: profileData.username, avatar_url: profileData.avatar_url });
     setEditUsername(profileData.username || '');
@@ -177,16 +183,28 @@ function MyChannelInner() {
   // === Dropzone ===
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (!acceptedFiles[0]) return;
-    setInitialFile(acceptedFiles[0]);
-    setEditingVideo(null);
-    setShowModal(true);
+    if (activeTab === 'videos'){
+      setInitialFile(acceptedFiles[0]);
+      setEditingVideo(null);
+      setShowModal(true);
+      }
+      if (activeTab === 'customization'){
+        
+        handleBannerChange({ target: { files: acceptedFiles } } as any);
+        
+      }
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps : getVideoRoot, getInputProps :getVideoInput, isDragActive : isVideoDragActive} = useDropzone({
     onDrop,
     accept: { 'video/*': [] },
     multiple: false,
   });
+  const { getRootProps : getBannerRoot, getInputProps : getBannerInput, isDragActive: isBannerDragActive } = useDropzone({
+  onDrop,
+  accept: { 'image/*': [] },
+  multiple: false,
+});
 
   const openEditVideoModal = useCallback((video: Video) => {
     setEditingVideo(video);
@@ -199,6 +217,58 @@ function MyChannelInner() {
     await supabase.auth.signOut();
     router.push('/feed');
   }, [router]);
+
+const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
+  toastInfo("Mise à jour de la bannière en cours...");
+  console.log(e);
+    const file = e.target.files?.[0];
+    if (!file) {
+      toastError('Aucun fichier sélectionné.');
+      return};
+
+    if (bannerObjectUrlRef.current) URL.revokeObjectURL(bannerObjectUrlRef.current);
+
+    const url = URL.createObjectURL(file);
+    avatarObjectUrlRef.current = url;
+    setBannerURL(url);
+
+    // Upload avatar to Supabase storage and update profile
+    const user = await getSessionUser();
+    if (!user) {
+      toastError('Session expirée. Veuillez vous reconnecter.');
+      return;
+    }
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `banners/${user.id}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage.from('banners').upload(filePath, file, {
+      upsert: true,
+      cacheControl: '3600',
+    });
+
+    if (uploadError) {
+      toastError('Erreur lors du téléchargement de la nouvelle bannière.');
+      return;
+    }
+
+    const { data } = supabase.storage.from('banners').getPublicUrl(filePath);
+    const publicUrl = data?.publicUrl;
+
+    if (publicUrl) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ bannerURL: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        toastError('Erreur lors de la mise à jour du profil.');
+      } else {
+        toastSuccess('Image de bannière mise à jour.');
+        await fetchProfile();
+      }
+    }
+  }, [getSessionUser, toastError, toastSuccess, fetchProfile]);
 
   const handleUsernameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setEditUsername(e.target.value);
@@ -378,9 +448,9 @@ function MyChannelInner() {
                 {activeTab === 'videos' && (
                   <section>
                     <h3>{TEXT.manageVideos}</h3>
-                    <div {...getRootProps({ className: styles.dropzone })}>
-                      <input {...getInputProps()} />
-                      {isDragActive ? <p>{TEXT.dropzoneActive}</p> : <p>{TEXT.dropzoneIdle}</p>}
+                    <div {...getVideoRoot({ className: styles.dropzone })}>
+                      <input {...getVideoInput()} />
+                      {isVideoDragActive ? <p>{TEXT.dropzoneActive}</p> : <p>{TEXT.dropzoneIdle}</p>}
                     </div>
 
                     {loadingVideos ? (
@@ -397,11 +467,30 @@ function MyChannelInner() {
                   <section>
                     <h3>{TEXT.customizeChannel}</h3>
                     <div className={styles.formGroup}>
-                      <label>{TEXT.channelBanner}</label>
+                      <h5>{TEXT.channelBanner}</h5>
                       <div className={styles.bannerPreview}>
-                        <img src="https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière" alt="Bannière de la chaîne" />
-                        <button type="button">{TEXT.edit}</button>
+                        <div {...getBannerRoot({ className: styles.dropzoneBanner })}>
+                      <input {...getBannerInput()} />
+                      {isBannerDragActive ? <p>{TEXT.dropzoneActive}</p> : <img src={BannerURL} alt="Bannière de la chaîne" />}
+                      <label
+                          htmlFor="bannerEdit"
+                          className="inline-flex 
+                                    items-center justify-center 
+                                    px-4 py-2 border border-gray-400 
+                                    rounded-md cursor-pointer
+                                    text-gray-700 font-medium
+                                    hover:bg-gray-100 hover:border-gray-500
+                                    transition-colors"
+                        >
+                          Changer la bannière
+                        </label>
+                      <input id="bannerEdit" type="file" accept="image/*" className='hidden' onChange={handleBannerChange} />
+                    </div>
+                    
                       </div>
+                      
+
+                      
                     </div>
 
                     <div className={styles.formGroup}>

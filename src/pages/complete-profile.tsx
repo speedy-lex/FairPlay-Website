@@ -170,7 +170,7 @@ export default function CompleteProfile() {
           data: { username: trimmedUsername, avatar_url },
         });
 
-        router.push('/profile');
+        router.push('/mychannel');
       } catch (e: any) {
         setError(`${TEXT.unexpectedFinalError} ${e.message}`);
         setIsSubmitting(false);

@@ -79,6 +79,19 @@
 }
 .dropzone:hover { border-color: var(--color-accent); }
 
+.dropzoneBanner {
+ 
+  border-radius: 14px;
+  
+  margin-bottom: 24px;
+  text-align: center;
+  color: var(--color-text-light);
+  
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+.dropzoneBanner:hover { border-color: var(--color-accent); }
+
 /* Grid stats */
 .statsGrid {
   display: grid;
@@ -289,6 +302,14 @@
   margin-bottom: 0.5rem;
   display: block;
   color: var(--color-medium-gray);
+}
+.changeBannerButton {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-light-gray);
+  background: var(--color-light-gray);
+  color: var(--color-dark-gray);
+  cursor: pointer;
 }
 
 .input,
