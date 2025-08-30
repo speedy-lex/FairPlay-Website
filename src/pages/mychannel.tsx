@@ -472,20 +472,20 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
                         <div {...getBannerRoot({ className: styles.dropzoneBanner })}>
                       <input {...getBannerInput()} />
                       {isBannerDragActive ? <p>{TEXT.dropzoneActive}</p> : <img src={BannerURL} alt="Bannière de la chaîne" />}
+                      </div>
+                      <button type="button" >
                       <label
                           htmlFor="bannerEdit"
-                          className="inline-flex 
-                                    items-center justify-center 
-                                    px-4 py-2 border border-gray-400 
-                                    rounded-md cursor-pointer
-                                    text-gray-700 font-medium
-                                    hover:bg-gray-100 hover:border-gray-500
-                                    transition-colors"
+                          className={styles.changeBannerButton}
+                          
                         >
-                          Changer la bannière
+                          Edit Banner
                         </label>
-                      <input id="bannerEdit" type="file" accept="image/*" className='hidden' onChange={handleBannerChange} />
-                    </div>
+                        <input id="bannerEdit" type="file" accept="image/*" className='hidden' onChange={handleBannerChange} />
+                        </button>
+                        
+                      
+                  
                     
                       </div>
                       
@@ -512,6 +512,7 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
                       <button onClick={handleSaveProfile} disabled={loadingSave}>
                         {loadingSave ? TEXT.saving : TEXT.saveChanges}
                       </button>
+                      
                     </div>
                   </section>
                 )}
@@ -537,6 +538,7 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
                 )}
 
                 <div className={styles.actions}>
+                  
                   {is_admin && <button type="button" onClick={() => router.push("/adminpanel")}>{TEXT.adminpanelbutton}</button>}
                   {is_moderator && <button type="button" onClick={() => router.push("/moderation-panel")}>{TEXT.moderationpanelbutton}</button>}
                   <button type="button" onClick={handleLogout}>{TEXT.logout}</button>
