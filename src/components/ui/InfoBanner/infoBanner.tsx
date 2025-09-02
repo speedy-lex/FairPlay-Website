@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './infoBanner.module.css';
 
 export const DevBanner = () => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const dismissed = localStorage.getItem('infoBannerDismissed');
@@ -15,6 +15,7 @@ export const DevBanner = () => {
   };
 
   if (!visible) return null;
+console.log("DevBanner visible?", visible);
 
   return (
     <div className={styles.infoBanner}>
