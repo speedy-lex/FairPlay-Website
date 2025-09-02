@@ -12,6 +12,7 @@ import { ToastProvider, useToast } from '@/components/ui/Toast/Toast';
 import styles from './mychannel.module.css';
 import { Topbar } from '@/components/ui/Topbar/Topbar'
 import { Sidebar } from '@/components/ui/Sidebar/Sidebar'
+import Image from 'next/image'
 
 type ProfileData = {
   username: string;
@@ -81,8 +82,7 @@ function MyChannelInner() {
   const [initialFile, setInitialFile] = useState<File | null>(null);
   const [is_admin, setIs_admin] = useState(false);
   const [is_moderator, setIs_moderator] = useState(false);
-  const [BannerURL, setBannerURL] = useState<string>("https://placehold.co/1200x250/557CD9/FFFFFF?text=Bannière" as any);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [BannerURL, setBannerURL] = useState<string>("https://placehold.co/1200x250/557CD9/FFFFFF?text=Banner");
 
   // === Utils ===
   const getSessionUser = useCallback(async () => {
@@ -99,7 +99,7 @@ function MyChannelInner() {
     setLoadingProfile(true);
     const user = await getSessionUser();
     if (!user) {
-      toastError('Session expirée. Veuillez vous reconnecter.');
+  toastError('Session expired. Please log in again.');
       setLoadingProfile(false);
       //router.push('/');
       return;
@@ -112,7 +112,7 @@ function MyChannelInner() {
       .single();
 
     if (error) {
-      toastError('Impossible de charger le profil.');
+      toastError('Unable to load profile.');
       setLoadingProfile(false);
       return;
     }
@@ -129,18 +129,18 @@ function MyChannelInner() {
     setEditUsername(profileData.username || '');
     setAvatarPreview(profileData.avatar_url);
     setLoadingProfile(false);
-  }, [getSessionUser, router, toastError]);
+  }, [getSessionUser, toastError]);
 
   const fetchExistingThemes = useCallback(async () => {
     const { data, error } = await supabase.from('videos').select('themes');
     if (error) {
-      toastInfo('Les suggestions de thèmes ne sont pas disponibles pour le moment.');
+  toastInfo('Theme suggestions are not available at the moment.');
       return;
     }
     if (data) {
       const all = data.flatMap((v: { themes: unknown }) => {
         try {
-          return parseThemes(v.themes as any);
+          return parseThemes(v.themes as string[]);
         } catch {
           return [] as string[];
         }
@@ -165,7 +165,7 @@ function MyChannelInner() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      toastError('Erreur lors du chargement des vidéos.');
+  toastError('Error loading videos.');
       setLoadingVideos(false);
       return;
     }
@@ -181,19 +181,87 @@ function MyChannelInner() {
   }, [fetchProfile, fetchVideos, fetchExistingThemes]);
 
   // === Dropzone ===
+  // handleBannerChange must be declared before onDrop so it can be referenced safely
+  const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
+    toastInfo("Updating banner...");
+    const file = e.target.files?.[0];
+    if (!file) {
+      toastError('No file selected.');
+      return;
+    }
+
+    if (bannerObjectUrlRef.current) {
+      URL.revokeObjectURL(bannerObjectUrlRef.current);
+      bannerObjectUrlRef.current = null;
+    }
+
+    const url = URL.createObjectURL(file);
+    bannerObjectUrlRef.current = url;
+    setBannerURL(url);
+
+    // Upload banner to Supabase storage and update profile
+    const user = await getSessionUser();
+    if (!user) {
+      toastError('Session expired. Please log in again.');
+      return;
+    }
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `banners/${user.id}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage.from('banners').upload(filePath, file, {
+      upsert: true,
+      cacheControl: '3600',
+    });
+
+    if (uploadError) {
+      toastError('Error uploading new banner.');
+      return;
+    }
+
+    const { data } = supabase.storage.from('banners').getPublicUrl(filePath);
+    const publicUrl = data?.publicUrl;
+
+    if (publicUrl) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ bannerURL: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        toastError('Error updating profile.');
+      } else {
+        toastSuccess('Banner image updated.');
+        await fetchProfile();
+      }
+    }
+  }, [getSessionUser, toastError, toastSuccess, toastInfo, fetchProfile]);
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (!acceptedFiles[0]) return;
     if (activeTab === 'videos'){
       setInitialFile(acceptedFiles[0]);
       setEditingVideo(null);
       setShowModal(true);
-      }
-      if (activeTab === 'customization'){
-        
-        handleBannerChange({ target: { files: acceptedFiles } } as any);
-        
-      }
-  }, []);
+      return;
+    }
+    if (activeTab === 'customization') {
+      const file = acceptedFiles[0];
+      const input = document.createElement('input');
+      input.type = 'file';
+
+      // Create a proper file list
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      input.files = dataTransfer.files;
+
+      // Create and dispatch a change event with the input as target
+      const event = new Event('change', { bubbles: true });
+      Object.defineProperty(event, 'target', { writable: false, value: input });
+
+      handleBannerChange(event as unknown as ChangeEvent<HTMLInputElement>);
+    }
+  }, [activeTab, handleBannerChange]);
 
   const { getRootProps : getVideoRoot, getInputProps :getVideoInput, isDragActive : isVideoDragActive} = useDropzone({
     onDrop,
@@ -218,57 +286,7 @@ function MyChannelInner() {
     router.push('/feed');
   }, [router]);
 
-const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
-  toastInfo("Mise à jour de la bannière en cours...");
-  console.log(e);
-    const file = e.target.files?.[0];
-    if (!file) {
-      toastError('Aucun fichier sélectionné.');
-      return};
-
-    if (bannerObjectUrlRef.current) URL.revokeObjectURL(bannerObjectUrlRef.current);
-
-    const url = URL.createObjectURL(file);
-    avatarObjectUrlRef.current = url;
-    setBannerURL(url);
-
-    // Upload avatar to Supabase storage and update profile
-    const user = await getSessionUser();
-    if (!user) {
-      toastError('Session expirée. Veuillez vous reconnecter.');
-      return;
-    }
-
-    const fileExt = file.name.split('.').pop();
-    const filePath = `banners/${user.id}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage.from('banners').upload(filePath, file, {
-      upsert: true,
-      cacheControl: '3600',
-    });
-
-    if (uploadError) {
-      toastError('Erreur lors du téléchargement de la nouvelle bannière.');
-      return;
-    }
-
-    const { data } = supabase.storage.from('banners').getPublicUrl(filePath);
-    const publicUrl = data?.publicUrl;
-
-    if (publicUrl) {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ bannerURL: publicUrl })
-        .eq('id', user.id);
-
-      if (updateError) {
-        toastError('Erreur lors de la mise à jour du profil.');
-      } else {
-        toastSuccess('Image de bannière mise à jour.');
-        await fetchProfile();
-      }
-    }
-  }, [getSessionUser, toastError, toastSuccess, fetchProfile]);
+// ...existing code...
 
   const handleUsernameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setEditUsername(e.target.value);
@@ -287,9 +305,9 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
     const { error: updateError } = await supabase.from('profiles').update(updates).eq('id', user.id);
 
     if (updateError) {
-      toastError('Échec de la sauvegarde du profil.');
+  toastError('Failed to save profile.');
     } else {
-      toastSuccess('Profil enregistré.');
+      toastSuccess('Profile saved successfully.');
       await fetchProfile();
     }
 
@@ -309,7 +327,7 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
     // Upload avatar to Supabase storage and update profile
     const user = await getSessionUser();
     if (!user) {
-      toastError('Session expirée. Veuillez vous reconnecter.');
+      toastError('Session expired. Please log in again.');
       return;
     }
 
@@ -322,7 +340,7 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
     });
 
     if (uploadError) {
-      toastError('Erreur lors du téléchargement de la nouvelle image de profil.');
+      toastError('Error uploading new profile image.');
       return;
     }
 
@@ -353,11 +371,11 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
 
   const handleDeleteVideo = useCallback(
     async (video: Video) => {
-      if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette vidéo ?')) return;
+      if (!window.confirm('Are you sure you want to delete this video?')) return;
 
       try {
         let pathToRemove: string | null = null;
-        const storagePath = (video as any).storage_path as string | undefined;
+        const storagePath = video.storage_path;
 
         if (storagePath) {
           pathToRemove = storagePath;
@@ -369,24 +387,24 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
         if (pathToRemove) {
           const { error: storageError } = await supabase.storage.from('videos').remove([pathToRemove]);
           if (storageError) {
-            console.warn('Erreur suppression fichier storage :', storageError);
-            toastInfo("Le fichier n'a pas été trouvé dans le storage, suppression des métadonnées…");
+            console.warn('Error deleting file from storage:', storageError);
+            toastInfo("File not found in storage, deleting metadata...");
           }
         } else {
-          toastInfo("Chemin du fichier introuvable, suppression des métadonnées uniquement.");
+          toastInfo("File path not found, deleting metadata only.");
         }
 
         const { error: dbError } = await supabase.from('videos').delete().eq('id', video.id);
         if (dbError) {
-          toastError('Suppression en base échouée.');
+          toastError('Database deletion failed.');
           return;
         }
 
         await fetchVideos();
-        toastSuccess('Vidéo supprimée.');
+        toastSuccess('Video deleted successfully.');
       } catch (err) {
-        console.error('Erreur lors de la suppression :', err);
-        toastError('Erreur lors de la suppression.');
+        console.error('Error during deletion:', err);
+        toastError('Error deleting video.');
       }
     },
     [fetchVideos, toastError, toastSuccess, toastInfo]
@@ -406,12 +424,13 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
             <div className={styles.mainContent}>
               <div className={styles.channelCard}>
                 <div className={styles.channelHeader}>
-                  <img
+                  <Image
                     src={avatarPreview || profile.avatar_url || TEXT.defaultAvatar}
                     alt={`${profile.username} avatar`}
                     width={140}
                     height={140}
                     style={{ borderRadius: '50%' }}
+                    priority
                   />
                   <div>
                     <h2>{profile.username}</h2>
@@ -471,7 +490,7 @@ const handleBannerChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) 
                       <div className={styles.bannerPreview}>
                         <div {...getBannerRoot({ className: styles.dropzoneBanner })}>
                       <input {...getBannerInput()} />
-                      {isBannerDragActive ? <p>{TEXT.dropzoneActive}</p> : <img src={BannerURL} alt="Bannière de la chaîne" />}
+                      {isBannerDragActive ? <p>{TEXT.dropzoneActive}</p> : <Image src={BannerURL} alt="Channel banner" width={1200} height={250} priority />}
                       </div>
                       <button type="button" >
                       <label
