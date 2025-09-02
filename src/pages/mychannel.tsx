@@ -118,6 +118,7 @@ function MyChannelInner() {
     }
     if (profileData.is_admin) {
       setIs_admin(true);
+      setIs_moderator(true);
     }
     if (profileData.is_moderator) {
       setIs_moderator(true);
