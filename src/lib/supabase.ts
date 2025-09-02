@@ -1,17 +1,16 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+// This file contains TypeScript code for Supabase client setup
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '../types/supabase'
 
-// Read env vars but avoid throwing during module evaluation. Some environments
-// (build, tests, or serverless edge runtimes) may not provide env vars at import time.
+// Read env vars (use empty string fallbacks to avoid runtime undefined)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('[supabase] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not set. Supabase client may not work until these are provided.')
+  throw new Error('Missing environment variables: NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY')
 }
 
-// Export a client even if keys are empty to avoid module-eval crashes. Calls made
-// with invalid credentials will fail at runtime with clearer Supabase errors.
-export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
