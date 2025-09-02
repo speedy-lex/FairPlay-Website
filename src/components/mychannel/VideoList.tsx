@@ -110,7 +110,7 @@ const VideoList: FC<VideoListProps> = ({ videos, onButton1: onButton1, onButton2
               <footer className={styles.videoFooter}>
                 
                 <ThemeTags themes={themes} />
-                <ActionButtons video={v} onButton1={onButton1} onButton2={onButton1} button1Text={button1Text} button2Text={button2Text} />
+                <ActionButtons video={v} onButton1={onButton1} onButton2={onButton2} button1Text={button1Text} button2Text={button2Text} />
               </footer>
             </div>
           </article>

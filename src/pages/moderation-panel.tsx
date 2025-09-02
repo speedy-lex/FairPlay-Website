@@ -10,6 +10,8 @@ import { Video } from "@/types";
 
 export default function AdminPanel() {
   const { error: toastError } = useToast();
+  const { success: toastSuccess } = useToast();
+  const { info: toastInfo } = useToast();
 
   const [isModerator, setisModerator] = useState(false);
   const [isloggedin, setIsloggedin] = useState(false);
@@ -24,10 +26,10 @@ export default function AdminPanel() {
       setIsloggedin(true);
       const { data: profile } = await supabase
         .from("profiles")
-        .select("is_moderator")
+        .select("is_moderator, is_admin")
         .eq("id", user.id)
         .single();
-      setisModerator(profile?.is_moderator ?? false);
+      setisModerator(profile?.is_moderator ?? profile?.is_admin ?? false);
       //setuser(user?.id);
     }
   }, []);
@@ -45,17 +47,16 @@ export default function AdminPanel() {
     }
     return data || [];
   }, [toastError]);
-
-  const fetchusersession = useCallback(async () => {
+    const fetchusersession = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     const user = session?.user;
     if (user?.id) {
       setuser(user.id);
-      console.log("user", user.id);
     } else {
       toastError("User ID is undefined");
     }
   }, [supabase.auth]);
+
 
   useEffect(() => {
     (async () => {
@@ -67,6 +68,9 @@ export default function AdminPanel() {
       setLoading(false);
     })();
   }, [isModerator, fetchModeratorStatus, fetchVideos]);
+
+
+
 
  const updateVideo = useCallback(async (video: Video) => {
     const { error } = await supabase 
@@ -88,6 +92,10 @@ export default function AdminPanel() {
   }, [toastError]);
 
   const handleAprove = useCallback(async (video: Video) => {
+    if (userId === video.verifiedOnce_user_id) {
+      toastError("You have already approved this video.");
+      return;
+    }
     if (userId === video.refusedOnce_user_id) {
       video.refusedOnce_user_id = null;
       video.refusedOnce = false;
@@ -100,12 +108,15 @@ export default function AdminPanel() {
     if (video.verifiedOnce && !video.is_refused && userId !== video.verifiedOnce_user_id) {
       video.is_verified = true;
     }
-    console.log(video);
-    console.log("userid", userId);
+    toastSuccess("Video approved successfully.");
     await updateVideo(video);
-  }, []);
+  }, [userId, updateVideo]);
 
   const handleRefuse = useCallback(async (video: Video) => {
+    if (userId === video.refusedOnce_user_id) {
+      toastError("You have already refused this video.");
+      return;
+    }
     if (userId === video.verifiedOnce_user_id) {
       video.verifiedOnce_user_id = null;
       video.verifiedOnce = false;
@@ -120,9 +131,11 @@ export default function AdminPanel() {
     if (video.refusedOnce && video.verifiedOnce && userId !== video.refusedOnce_user_id && userId !== video.verifiedOnce_user_id) {
       video.is_refused = true;
     }
+    toastSuccess("Video refused successfully.");
+
     await updateVideo(video);
 
-}, []);
+}, [userId, updateVideo]);
 
   if (loading) {
     return (
