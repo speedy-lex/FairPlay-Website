@@ -46,18 +46,18 @@ export async function getNativeVideoDuration(
       if (duration && !isNaN(duration) && isFinite(duration)) {
         resolve(duration);
       } else {
-        reject(new Error('Durée invalide récupérée'));
+  reject(new Error('Invalid duration retrieved'));
       }
       cleanup();
     };
 
     const onError = () => {
-      reject(new Error('Échec du chargement des métadonnées vidéo'));
+  reject(new Error('Failed to load video metadata'));
       cleanup();
     };
 
     timeoutId = window.setTimeout(() => {
-      reject(new Error('Timeout en récupérant la durée de la vidéo'));
+  reject(new Error('Timeout while retrieving video duration'));
       cleanup();
     }, timeoutMs);
 
@@ -73,7 +73,7 @@ export async function fetchYoutubeDuration(
 ): Promise<string> {
   const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
   if (!apiKey) {
-    console.warn('Aucune clé API YouTube définie dans NEXT_PUBLIC_YOUTUBE_API_KEY');
+  console.warn('No YouTube API key defined in NEXT_PUBLIC_YOUTUBE_API_KEY');
     return '';
   }
 
@@ -96,7 +96,7 @@ export async function fetchYoutubeDuration(
     if (typeof duration === 'string') return duration;
     return '';
   } catch (err) {
-    console.warn('Erreur lors de la récupération de la durée YouTube :', err);
+  console.warn('Error while retrieving YouTube duration:', err);
     return '';
   }
 }

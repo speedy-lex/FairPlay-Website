@@ -19,21 +19,26 @@ export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('Tous');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [loginwithoutpassword, setLoginwithoutpassword] = useState(false);
 
   const fetchVideos = useCallback(async () => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      let vids: any[] = [];
+      let vids: Video[] = [];
       if (user) {
         vids = await getRecommendedVideos(user.id);
       } else {
-        const { data } = await supabase
+        const { data, error: fetchError } = await supabase
             .from('videos')
-            .select('id, title, description, type, url, youtube_id, user_id, quality_score, themes, duration, thumbnail')
+            .select('id, title, description, type, url, youtube_id, user_id, quality_score, themes, duration, thumbnail, created_at')
             .order('quality_score', { ascending: false });
+            
+        if (fetchError) {
+          throw new Error(fetchError.message);
+        }
+        
         vids = data || [];
       }
       
@@ -48,8 +53,9 @@ export default function VideosPage() {
       );
       setVideos(vidsWithDuration);
       setError(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      console.error('Error fetching videos:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching videos');
     }
     setLoading(false);
   }, []);
@@ -68,14 +74,14 @@ export default function VideosPage() {
     }, [fetchVideos]);
 
   const categories = React.useMemo(() => {
-    const all = videos.flatMap(v => parseThemes((v as any).themes));
+    const all = videos.flatMap(v => parseThemes(v.themes));
     const unique = Array.from(new Set(all));
     return ['Tous', ...unique];
   }, [videos]);
 
   const filteredVideos = selectedCategory === 'Tous'
     ? videos
-    : videos.filter(v => parseThemes((v as any).themes).includes(selectedCategory));
+    : videos.filter(v => parseThemes(v.themes).includes(selectedCategory));
 
   return (
     <>

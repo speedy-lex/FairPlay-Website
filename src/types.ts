@@ -18,6 +18,7 @@ export type Video = {
   thumbnail: string | null
   is_verified?: boolean | null
   is_refused?: boolean | null
+  storage_path?: string
   refusal_reason?: string | null
   verifiedOnce?: boolean | null
   refusedOnce?: boolean | null

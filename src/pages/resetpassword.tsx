@@ -1,10 +1,9 @@
-import React, { useState, useCallback, FormEvent, useEffect } from 'react';
+import React, { useState, useCallback, FormEvent } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { supabase } from '@/lib/supabase';
 import { Topbar } from '@/components/ui/Topbar/Topbar';
 import styles from './login.module.css';
-import { type EmailOtpType } from '@supabase/supabase-js'
 
 const TEXT = {
   title: 'Authentification',
@@ -20,34 +19,10 @@ const TEXT = {
 export default function Auth() {
   
   const router = useRouter();
-  const { token_hash, type, next } = router.query as {
-    token_hash?: string;
-    type?: EmailOtpType;
-    next?: string;
-  };
-
-  // You may want to handle the verification in a useEffect if needed
-  // Example:
-  // useEffect(() => {
-  //   const verify = async () => {
-  //     if (token_hash && type) {
-  //       const { error } = await supabase.auth.verifyOtp({
-  //         type,
-  //         token_hash,
-  //       });
-  //       if (!error) {
-  //         router.replace(next ?? '/reset-password');
-  //       }
-  //     }
-  //   };
-  //   verify();
-  // }, [token_hash, type, next, router]);
-
-  const [registerEmail, setRegisterEmail] = useState('');
+  
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
-  const [registerUsername, setRegisterUsername] = useState('');
-  const [Error, setRegisterError] = useState('');
+  const [registerError, setRegisterError] = useState('');
   const [registerMessage, setRegisterMessage] = useState('');
   const [registerLoading, setRegisterLoading] = useState(false);
 
@@ -61,8 +36,7 @@ export default function Auth() {
       resetErrors();
       e.preventDefault();
       if (registerLoading) return;
-      setRegisterError('');
-      setRegisterMessage('');
+      resetErrors();
 
       if (registerPassword !== registerConfirmPassword) {
         setRegisterError(TEXT.passwordMismatch);
@@ -71,23 +45,21 @@ export default function Auth() {
 
       setRegisterLoading(true);
       try {
-        localStorage.setItem('pending_username', registerUsername.trim());
-
-        const { error } = await supabase.auth.updateUser({password: registerPassword});
-            
+        const { error } = await supabase.auth.updateUser({ password: registerPassword });
 
         if (error) {
           setRegisterError(error.message);
           return;
         }
 
+        router.push('/login');
       } catch {
-        setRegisterError("Une erreur est survenue lors de l'inscription.");
+        setRegisterError("An error occurred while resetting your password.");
       } finally {
         setRegisterLoading(false);
       }
     },
-    [registerEmail, registerPassword, registerConfirmPassword, registerUsername, registerLoading]
+    [registerPassword, registerConfirmPassword, resetErrors, router, registerLoading]
   );
 /*
   useEffect(() => {
@@ -133,7 +105,7 @@ export default function Auth() {
                     required
                   />
                 </label>
-                {Error && <p className={styles.error}>{Error}</p>}
+                {registerError && <p className={styles.error}>{registerError}</p>}
                 {registerMessage && <p className={styles.success}>{registerMessage}</p>}
                 <button type="submit" disabled={registerLoading}>
                   {registerLoading ? '…' : TEXT.saveButton}
