@@ -46,5 +46,3 @@ Open `http://localhost:3000` in your browser to see the app.
 
 The application exposes a public API under `/api/v1`. Currently the following endpoint is available:
 - `GET /api/v1/videos` – list all uploaded videos
-
-Videos can have several tags. When uploading, type `/` in the tag field to get suggestions based on existing tags.
