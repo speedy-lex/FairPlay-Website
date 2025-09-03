@@ -76,10 +76,10 @@ export default function VideosPage() {
   const categories = React.useMemo(() => {
     const all = videos.flatMap(v => parseThemes(v.themes));
     const unique = Array.from(new Set(all));
-    return ['Tous', ...unique];
+    return ['All', ...unique];
   }, [videos]);
 
-  const filteredVideos = selectedCategory === 'Tous'
+  const filteredVideos = selectedCategory === 'All'
     ? videos
     : videos.filter(v => parseThemes(v.themes).includes(selectedCategory));
 
