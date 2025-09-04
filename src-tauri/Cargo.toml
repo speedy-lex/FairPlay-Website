@@ -3,8 +3,8 @@ name = "fairplay-app"
 version = "0.1.0"
 description = "The fairplay tauri app"
 authors = []
-license = ""
-repository = ""
+license = "MIT"
+repository = "https://github.com/FairPlayTeam/FairPlay-Website"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
