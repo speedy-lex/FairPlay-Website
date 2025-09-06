@@ -32,6 +32,16 @@ const nextConfig: NextConfig = {
       { source: "/roadmap", destination: "/roadmap.html" },
     ];
   },
+
+  webpack: (config, {}) => {
+    // avoid wasm errors
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: 'webassembly/async',
+    });
+
+    return config;
+  },
 };
 
 export default nextConfig;
