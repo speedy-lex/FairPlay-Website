@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "fairplay",
   "version": "0.1.0",
-  "identifier": "com.fairplay.app",
+  "identifier": "com.fairplay.client",
   "build": {
     "frontendDist": "../public",
     "devUrl": "http://localhost:3000",

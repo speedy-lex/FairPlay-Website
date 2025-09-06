@@ -1,4 +1,4 @@
-package com.fairplay.app
+package com.fairplay.client
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
