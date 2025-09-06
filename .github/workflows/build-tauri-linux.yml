@@ -25,6 +25,8 @@ jobs:
             - run:
                 npm install
             - run:
+                cp .env.dummy .env.local
+            - run:
                 npm exec tauri build
 
             - uses: actions/upload-artifact@v4
