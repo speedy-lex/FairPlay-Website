@@ -32,7 +32,7 @@ jobs:
                 cp .env.dummy .env.local
             - name: Build
               run:
-                npm exec tauri build --verbose --ci --no-bundle
+                npm exec tauri build --verbose --ci
 
             - name: Upload artifacts
               uses: actions/upload-artifact@v4
