@@ -93,6 +93,7 @@
 
 .downloadButton:hover {
   background-color: var(--color-accent-dark);
+  color: var(--color-white)
 }
 
 .donateButton {
