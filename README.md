@@ -34,7 +34,7 @@ Open `http://localhost:3000` in your browser to see the app.
 
 - `npm run dev` – start the Next.js dev server
 - `npm run build` – build the application for production
-- `npm run lint` – run ESLint
+- `npm run lint` – run ESLint (Won't be available for now due to the current security advisory: https://github.com/advisories/GHSA-8mgj-vmr8-frr6)
 
 ## Project structure
 
